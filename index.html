@@ -17,7 +17,7 @@
 
   <script>
     const username = 'bobostar-ai';       // GitHub 사용자명 또는 조직명
-    const repo = 'my-html-story';           // 파일이 올라간 리포지토리명
+    const repo = 'html-Project';           // 파일이 올라간 리포지토리명
     const branch = 'main';               // 브랜치명 (보통 main)
 
     async function fetchFiles() {
@@ -36,7 +36,7 @@
     const li = document.createElement('li');
     const a = document.createElement('a');
     // GitHub Pages용 경로로 변경
-    a.href = `https://bobostar-ai.github.io/my-html-story/${file.name}`;
+    a.href = `https://bobostar-ai.github.io/html-Project/${file.name}`;
     a.textContent = `${count}. ${file.name}`;
     a.target = "_blank";
     li.appendChild(a);
