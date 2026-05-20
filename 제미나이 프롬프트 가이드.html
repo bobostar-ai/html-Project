@@ -1,0 +1,670 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>✨ 제미나이 프롬프트 가이드 (Gemini Prompt Guide) - Pro Version</title>
+    <style>
+        /* 웹폰트 적용 (Pretendard) */
+        @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
+
+        :root {
+            --primary-color: #0066ff;
+            --success-color: #00c853;
+            --bg-color: #f4f6f8;
+            --card-bg: #ffffff;
+            --text-main: #1d1d1f;
+            --text-muted: #6e6e73;
+            --prompt-bg: #1e1e1e;
+            --prompt-text: #e8e8ed;
+        }
+
+        body { 
+            font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, Roboto, sans-serif; 
+            line-height: 1.6; 
+            color: var(--text-main); 
+            background-color: var(--bg-color);
+            margin: 0; 
+            padding: 40px 20px; 
+        }
+
+        .container {
+            max-width: 860px;
+            margin: 0 auto;
+        }
+
+        h1 { 
+            text-align: center; 
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: var(--text-main);
+            margin-bottom: 10px;
+            letter-spacing: -0.5px;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: var(--text-muted);
+            margin-bottom: 40px;
+            font-size: 1.1rem;
+        }
+
+        .disclaimer { 
+            background-color: #fff8e1; 
+            border-left: 5px solid #ffb300; 
+            padding: 16px 20px; 
+            margin-bottom: 30px; 
+            color: #b08d00; 
+            font-weight: 600;
+            border-radius: 8px; 
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+        }
+
+        /* 카드 섹션 스타일 */
+        .section { 
+            background-color: var(--card-bg); 
+            margin-bottom: 30px; 
+            padding: 30px; 
+            border-radius: 16px; 
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05); 
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        
+        .section:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+        }
+
+        h2 { 
+            color: var(--text-main); 
+            margin-top: 0; 
+            margin-bottom: 15px;
+            font-size: 1.5rem;
+            display: flex;
+            align-items: center;
+            border-bottom: 2px solid #f0f0f0;
+            padding-bottom: 15px;
+        }
+
+        .icon { margin-right: 10px; font-size: 1.3em; }
+
+        .purpose { 
+            display: inline-block;
+            background-color: #e8f0fe; 
+            color: #1967d2;
+            padding: 6px 14px; 
+            border-radius: 20px; 
+            margin-bottom: 20px; 
+            font-size: 0.95rem;
+            font-weight: 600;
+        }
+
+        /* 프롬프트 박스 및 복사 버튼 */
+        .prompt-wrapper {
+            position: relative;
+            margin-bottom: 20px;
+        }
+
+        .prompt-box { 
+            background-color: var(--prompt-bg); 
+            color: var(--prompt-text);
+            padding: 24px; 
+            border-radius: 12px; 
+            font-family: 'Courier New', Courier, monospace; 
+            font-size: 1rem; 
+            line-height: 1.7;
+            overflow-x: auto;
+            white-space: pre-wrap;
+        }
+
+        .copy-btn {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            background-color: rgba(255, 255, 255, 0.1);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 6px 14px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            font-weight: 600;
+            transition: all 0.2s ease;
+            backdrop-filter: blur(4px);
+        }
+
+        .copy-btn:hover {
+            background-color: rgba(255, 255, 255, 0.2);
+        }
+
+        .copy-btn.copied {
+            background-color: var(--success-color);
+            border-color: var(--success-color);
+            color: white;
+        }
+
+        /* 사용법 가이드 */
+        .how-to { 
+            background-color: #fafafa; 
+            border-left: 4px solid var(--primary-color); 
+            padding: 16px 20px; 
+            border-radius: 0 8px 8px 0; 
+            font-size: 0.95rem;
+            color: #444;
+        }
+
+        .how-to strong {
+            color: var(--primary-color);
+            display: block;
+            margin-bottom: 8px;
+        }
+
+        .how-to ul {
+            margin: 0;
+            padding-left: 20px;
+        }
+
+        .how-to li {
+            margin-bottom: 4px;
+        }
+
+        /* 보너스 섹션 */
+        .bonus { 
+            background: linear-gradient(145deg, #fff3e0, #ffe0b2);
+            border: none;
+        }
+        
+        .bonus h2 { border-bottom-color: #ffcc80; }
+        .bonus .purpose { background-color: #ffecb3; color: #f57f17; }
+        .bonus .prompt-box { background-color: #fff9c4; color: #3e2723; border: 1px solid #ffd54f; }
+        .bonus .copy-btn { background-color: #ffa000; color: white; border: none; }
+        .bonus .copy-btn:hover { background-color: #ff8f00; }
+        
+        h3.bonus-title {
+            color: #e65100;
+            margin-top: 25px;
+            font-size: 1.2rem;
+        }
+        
+        /* 반응형 디자인 */
+        @media (max-width: 600px) {
+            body { padding: 20px 10px; }
+            h1 { font-size: 2rem; }
+            .section { padding: 20px; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>✨ Gemini Prompt Guide</h1>
+    <div class="subtitle">업무 효율을 극대화하는 실전 프롬프트 모음집</div>
+
+    <div class="disclaimer">
+        ⚠️ <strong>주의사항:</strong> AI 결과물은 훌륭한 초안입니다. 숫자, 날짜, 정책, 가격, 저작권 관련 내용은 반드시 사람의 눈으로 최종 확인해 주세요.
+         유튜버가 공유한 프롬프트를 제가 다시 업데이트 해서 만든것 입니다. 공유는 하지 마시기 바랍니다. 유튜버 주소나 이름이 기억이 안나서리....
+    </div>
+
+    <div class="section">
+        <h2><span class="icon">📄</span> 1. PDF 보고서 만들기</h2>
+        <div class="purpose">▶ 업무 효율화 방안을 초보자용 PDF 보고서로 자동 생성</div>
+        
+        <div class="prompt-wrapper">
+            <button class="copy-btn" onclick="copyPrompt(this)">복사하기 📋</button>
+            <div class="prompt-box">제미나이로 업무 시간을 줄이는 방법을 초보자도 이해하기 쉬운 PDF 보고서로 만들어줘.
+보고서에는 아래 내용을 포함해줘.
+
+1. 제미나이를 질문용으로만 쓰면 한계가 있는 이유
+2. 파일 생성 기능이 업무 시간을 줄여주는 이유
+3. PDF, Word, Excel, Google Docs, Google Sheets 활용 예시
+4. 실제 업무에 적용할 때 주의할 점
+5. 마지막 요약
+
+핵심 내용은 표로 깔끔하게 정리하고, 결과물은 반드시 PDF 파일 형태로 생성해줘.</div>
+        </div>
+        
+        <div class="how-to">
+            <strong>💡 실전 활용 가이드</strong>
+            <ul>
+                <li>프롬프트 첫 줄의 '제미나이로 업무 시간을 줄이는 방법'을 <strong>[원하는 보고서 주제]</strong>로 변경하세요.</li>
+                <li>보고서에 들어가야 할 목차(1~5번)를 본인의 기획에 맞게 수정하여 요청하면 구조화된 문서가 나옵니다.</li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="section">
+        <h2><span class="icon">📝</span> 2. Excel / Google Sheets 체크리스트 만들기</h2>
+        <div class="purpose">▶ 업무 단계를 구조화된 표 형식의 스프레드시트 파일로 생성</div>
+        
+        <div class="prompt-wrapper">
+            <button class="copy-btn" onclick="copyPrompt(this)">복사하기 📋</button>
+            <div class="prompt-box">AI 업무 자동화 체크리스트를 Google Sheets(또는 Excel)에서 쓸 수 있는 표로 정리해줘.
+열은 아래처럼 구성해줘.
+
+1. 업무 단계
+2. 해야 할 일
+3. 예상 소요 시간
+4. AI로 줄일 수 있는 시간
+5. 사용할 제미나이 기능
+6. 주의할 점
+
+대상 업무: 문서 작성, 자료조사, 발표자료 만들기, 이미지 생성, 검수
+결과물은 바로 다운로드할 수 있는 Google Sheets 또는 Excel 파일 형태로 만들어줘.</div>
+        </div>
+        
+        <div class="how-to">
+            <strong>💡 실전 활용 가이드</strong>
+            <ul>
+                <li>'대상 업무' 항목을 현재 맡고 계신 직무(예: 신제품 마케팅 기획, 주간 실적 보고 등)로 변경하세요.</li>
+                <li>열(Column) 구성도 필요에 따라 '담당자', '마감일' 등을 추가할 수 있습니다.</li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="section">
+        <h2><span class="icon">🖼️</span> 3. Google Slides / PPT 초안 만들기</h2>
+        <div class="purpose">▶ 슬라이드 구성, 핵심 문구, 발표자 메모가 포함된 프레젠테이션 초안 생성</div>
+        
+        <div class="prompt-wrapper">
+            <button class="copy-btn" onclick="copyPrompt(this)">복사하기 📋</button>
+            <div class="prompt-box">제미나이로 업무 시간을 줄이는 방법을 7장짜리 Google Slides 발표자료 초안으로 만들어줘.
+대상: AI를 업무에 써보고 싶은 초보자
+
+각 슬라이드에는 아래 내용을 포함해줘.
+1. 슬라이드 제목
+2. 화면에 크게 들어갈 핵심 문장
+3. 보조 설명 1~2줄
+4. 추천 이미지 또는 아이콘 아이디어
+5. 발표자 메모 (대본)
+
+전체 흐름 순서:
+1. 문제 제시
+2. 질문용으로만 쓰면 한계가 있는 이유
+3. 파일 생성 기능 소개
+4. 구글 슬라이드 생성 기능 소개
+5. 실제 업무 활용 예시
+6. 주의할 점
+7. 요약 및 Q&A</div>
+        </div>
+        
+        <div class="how-to">
+            <strong>💡 실전 활용 가이드</strong>
+            <ul>
+                <li><strong>[7장짜리]</strong>와 <strong>[초보자]</strong> 부분을 실제 발표 분량과 청중 수준에 맞게 변경하세요.</li>
+                <li>결과물을 받은 후 구글 슬라이드 생성 도구를 연결하거나 내용을 템플릿에 바로 복사하여 사용하세요.</li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="section">
+        <h2><span class="icon">🔗</span> 4. 유튜브 링크 구조 분석</h2>
+        <div class="purpose">▶ 영상 내용을 베끼지 않고 성공 전략과 콘텐츠 기획 구조만 역설계</div>
+        
+        <div class="prompt-wrapper">
+            <button class="copy-btn" onclick="copyPrompt(this)">복사하기 📋</button>
+            <div class="prompt-box">너는 탁월한 유튜브 콘텐츠 기획자야.
+아래 유튜브 링크를 보고 내용을 베끼지 말고 '구조'만 분석해줘.
+
+분석 기준:
+1. 이 영상의 핵심 주제와 타겟 시청자
+2. 제목이 클릭을 유도하는 심리적 이유
+3. 초반 30초 오프닝에서 시청자를 붙잡는 훅(Hook) 방식
+4. 본문 전개 순서 (기승전결)
+5. 영상 이탈을 막는 중간 장치들
+6. 마지막 행동 유도(CTA) 방식
+7. 이 구조를 내 주제에 적용할 때의 추천 가이드
+
+주의사항: 내용 복사 금지. 초보자도 이해하기 쉽게 표와 요약 기호로 정리할 것.
+
+유튜브 링크: [여기에 분석할 링크 붙여넣기]</div>
+        </div>
+        
+        <div class="how-to">
+            <strong>💡 실전 활용 가이드</strong>
+            <ul>
+                <li>제일 하단의 <strong>[여기에 분석할 링크 붙여넣기]</strong> 괄호 부분에 벤치마킹할 영상 주소를 넣으세요.</li>
+                <li>자막이 활성화된 영상일수록 AI가 훨씬 더 정확한 뼈대를 잡아냅니다.</li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="section">
+        <h2><span class="icon">💡</span> 5. NotebookLM 다중 영상 패턴 분석</h2>
+        <div class="purpose">▶ 레퍼런스 영상들의 공통적인 흥행 요소를 종합적으로 도출</div>
+        
+        <div class="prompt-wrapper">
+            <button class="copy-btn" onclick="copyPrompt(this)">복사하기 📋</button>
+            <div class="prompt-box">이 노트북 소스에 들어 있는 유튜브 영상들의 공통적인 성공 패턴을 분석해줘.
+
+분석 기준:
+1. 제목에서 반복적으로 사용되는 후킹 단어나 공식
+2. 썸네일 문구의 공통된 텍스트 패턴
+3. 초반 30초 오프닝의 시선 집중 방식
+4. 본문 전개의 공통된 흐름
+5. 시청 시간을 늘리기 위한 시청자 유지 장치
+6. 효과적인 CTA(행동 유도) 방식
+7. 이 패턴들을 종합하여 초보자가 바로 따라 할 수 있는 템플릿 제안
+8. 무작정 따라 하면 역효과가 날 수 있는 위험한 부분
+
+주의사항: 특정 영상의 내용을 그대로 쓰지 말고, 공통된 뼈대와 규칙만 정리해줄 것.</div>
+        </div>
+        
+        <div class="how-to">
+            <strong>💡 실전 활용 가이드</strong>
+            <ul>
+                <li>이 프롬프트는 <strong>구글 NotebookLM</strong>에 벤치마킹할 영상 링크(또는 스크립트 텍스트)를 여러 개 소스로 업로드한 후 질문창에 입력하세요.</li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="section">
+        <h2><span class="icon">✨</span> 6. 젬스(Gems) 맞춤형 페르소나 셋팅</h2>
+        <div class="purpose">▶ 나만의 유튜브 기획자 AI 챗봇을 만들기 위한 시스템 프롬프트</div>
+        
+        <div class="prompt-wrapper">
+            <button class="copy-btn" onclick="copyPrompt(this)">복사하기 📋</button>
+            <div class="prompt-box">너는 AI 도구와 유튜브 콘텐츠를 쉽고 재밌게 설명하는 10년 차 콘텐츠 기획자야.
+내가 특정 주제나 벤치마킹 레퍼런스를 주면, 초보자도 바로 촬영에 들어갈 수 있도록 아래 형식으로 기획안을 도출해줘.
+
+1. 클릭을 부르는 제목 후보 5개
+2. 시선을 끄는 썸네일 문구 후보 5개
+3. 초반 이탈을 막는 30초 오프닝 대본
+4. 본문 구성 가이드 (시간대별 흐름)
+5. 촬영/편집 시 주의점
+6. 구독/좋아요를 자연스럽게 유도하는 멘트
+
+답변 조건:
+- 어려운 전문 용어는 피하고 친근한 말투 사용
+- 과장된 억지 후킹은 배제
+- 실제로 입 밖으로 냈을 때 자연스러운 구어체 대본으로 작성</div>
+        </div>
+        
+        <div class="how-to">
+            <strong>💡 실전 활용 가이드</strong>
+            <ul>
+                <li>제미나이 어드밴스드의 <strong>Gems 만들기 (맞춤형 AI 만들기)</strong>의 '지시사항' 칸에 이 내용을 그대로 붙여넣어 나만의 기획자를 생성하세요.</li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="section">
+        <h2><span class="icon">🧪</span> 7. 맞춤형 AI(Gems) 테스트 지시문</h2>
+        <div class="purpose">▶ 위에서 만든 젬(Gem)이 기획안을 잘 뽑아내는지 테스트</div>
+        
+        <div class="prompt-wrapper">
+            <button class="copy-btn" onclick="copyPrompt(this)">복사하기 📋</button>
+            <div class="prompt-box">[제미나이 최신 기능으로 AI 작업 시간 반으로 줄이는 법]
+
+이 주제로 오늘 바로 촬영할 수 있는 실전 영상 기획안을 뼈대부터 대본까지 작성해줘.</div>
+        </div>
+        
+        <div class="how-to">
+            <strong>💡 실전 활용 가이드</strong>
+            <ul>
+                <li>대괄호 <strong>[ ]</strong> 안의 주제를 현재 머릿속에 있는 아이디어 시드로 변경하여 입력창에 던져보세요.</li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="section">
+        <h2><span class="icon">🔍</span> 8. 구글 드라이브 문서 딥서치 & 요약</h2>
+        <div class="purpose">▶ 쌓여있는 드라이브 파일 중 필요한 내용을 찾아 핵심만 추출</div>
+        
+        <div class="prompt-wrapper">
+            <button class="copy-btn" onclick="copyPrompt(this)">복사하기 📋</button>
+            <div class="prompt-box">@Google Drive 에서 "AI 유튜브 강의안"과 관련된 문서를 모두 찾아줘.
+관련 문서를 찾았다면 흩어진 내용들을 종합해서 아래 형식으로 리포트를 작성해줘.
+
+1. 참고한 문서 제목들
+2. 전체 문서들을 관통하는 핵심 내용 5줄 요약
+3. 내가 지금 당장 업무에 적용할 수 있는 아이디어 3가지
+4. 문서에 빠져있거나 추가로 업데이트가 필요한 부분</div>
+        </div>
+        
+        <div class="how-to">
+            <strong>💡 실전 활용 가이드</strong>
+            <ul>
+                <li>반드시 프롬프트 창에서 <strong>@Google Drive</strong>를 입력하여 확장 프로그램을 호출한 뒤 사용해야 합니다.</li>
+                <li>"AI 유튜브 강의안" 대신 찾고자 하는 프로젝트명이나 키워드를 입력하세요.</li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="section">
+        <h2><span class="icon">📧</span> 9. 받은 편지함(Gmail) 인박스 제로 달성</h2>
+        <div class="purpose">▶ 수많은 메일 중 액션(답장/업무)이 필요한 핵심 메일만 필터링</div>
+        
+        <div class="prompt-wrapper">
+            <button class="copy-btn" onclick="copyPrompt(this)">복사하기 📋</button>
+            <div class="prompt-box">@Gmail 에서 최근 7일 동안 받은 메일 중, 내가 확인하거나 후속 조치(답장)를 해야 하는 중요한 메일만 추출해서 정리해줘.
+
+특히 아래 유형의 메일을 우선적으로 찾아줘:
+1. 외부 협업 및 제안
+2. 미팅 일정 조율
+3. 자료 검토 및 피드백 요청
+4. 결제/계약/인보이스 관련
+
+정리 포맷 (표 형식 권장):
+- 보낸 사람 (소속)
+- 메일 핵심 주제 요약 (1줄)
+- 내가 지금 해야 할 일 (Action Item)
+- 답장 기한 / 중요도 (높음/중간/낮음)</div>
+        </div>
+        
+        <div class="how-to">
+            <strong>💡 실전 활용 가이드</strong>
+            <ul>
+                <li>프롬프트 창에서 <strong>@Gmail</strong>을 타건하여 연동을 활성화해야 작동합니다.</li>
+                <li>기간(최근 7일)이나 특정 우선순위 키워드를 본인의 업무 환경에 맞게 조율하세요.</li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="section">
+        <h2><span class="icon">🔬</span> 10. Deep Research (심층 리서치) 보고서</h2>
+        <div class="purpose">▶ 최신 트렌드와 복잡한 주제를 깊이 있게 조사하여 인사이트 도출</div>
+        
+        <div class="prompt-wrapper">
+            <button class="copy-btn" onclick="copyPrompt(this)">복사하기 📋</button>
+            <div class="prompt-box">2026년 하반기 기준 'AI 업무 자동화 도구 트렌드'를 Deep Research 기능을 활용해 심층 조사해줘.
+보고서에는 반드시 아래 내용이 포함되어야 해.
+
+1. 2026년 AI 업무 자동화 시장의 가장 큰 패러다임 변화
+2. Gemini, ChatGPT, Claude 등 주요 LLM 도구별 실무 활용 장단점 비교
+3. 문서 작성, 자료조사, 발표자료, 이미지/파일 생성에서 AI가 실제로 단축해주는 시간 (사례 중심)
+4. 비개발자(초보자)가 도입 대비 효과를 가장 크게 볼 수 있는 Top 3 기능
+5. AI가 생성한 결과물을 맹신했을 때 발생하는 리스크
+6. 즉시 적용 가능한 한눈에 보는 요약 비교표
+
+문체: 전문적인 내용을 다루되, 대학교 신입생도 이해할 수 있을 만큼 쉽고 직관적인 언어로 작성할 것.</div>
+        </div>
+        
+        <div class="how-to">
+            <strong>💡 실전 활용 가이드</strong>
+            <ul>
+                <li>제미나이 어드밴스드의 기능 중 하나인 'Deep Research'를 활성화하고 사용하면 수십 개의 문서를 자율 탐색하여 고품질 보고서를 작성해 줍니다.</li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="section">
+        <h2><span class="icon">📊</span> 11. 프로세스 인포그래픽 이미지 생성</h2>
+        <div class="purpose">▶ 텍스트로 된 복잡한 업무 흐름을 시각적인 인포그래픽으로 변환</div>
+        
+        <div class="prompt-wrapper">
+            <button class="copy-btn" onclick="copyPrompt(this)">복사하기 📋</button>
+            <div class="prompt-box">AI 업무 자동화의 6단계 흐름을 직관적으로 설명하는 이미지를 생성해줘.
+
+포함될 6단계 프로세스:
+1. 질문하기 (프롬프트 입력)
+2. 자료조사 및 구조화
+3. 텍스트 문서/파일 생성
+4. 프레젠테이션(PPT) 시각화
+5. 보조 이미지/미디어 생성
+6. 사람의 최종 검수
+
+이미지 렌더링 가이드:
+- 초보자도 직관적으로 이해할 수 있는 깔끔한 플로우차트/인포그래픽 스타일
+- 각 단계가 부드러운 화살표나 빛나는 선으로 연결된 구조
+- 미래적이고 세련된 디지털 워크스페이스 무드 적용
+- 복잡한 텍스트보다는 직관적인 3D 아이콘을 중심으로 배치
+- 가로세로 비율: 16:9 와이드스크린용</div>
+        </div>
+        
+        <div class="how-to">
+            <strong>💡 실전 활용 가이드</strong>
+            <ul>
+                <li>제미나이의 이미지 생성 모델(Imagen 3 등)을 활용할 때, 구체적인 디자인 스타일(3D, 플랫 디자인, 네온 등)을 명시하면 퀄리티가 올라갑니다.</li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="section">
+        <h2><span class="icon">📸</span> 12. 유튜브 썸네일용 고해상도 배경 생성</h2>
+        <div class="purpose">▶ 텍스트 타이포그래피를 올리기 좋은 여백이 확보된 썸네일 베이스 제작</div>
+        
+        <div class="prompt-wrapper">
+            <button class="copy-btn" onclick="copyPrompt(this)">복사하기 📋</button>
+            <div class="prompt-box">'AI로 업무 시간 50% 단축하는 비밀'이라는 주제의 유튜브 썸네일용 배경 이미지를 만들어줘.
+
+이미지 연출 가이드:
+- 문서(PDF), 차트, 톱니바퀴 등 업무 자동화를 상징하는 홀로그램 아이콘들이 허공에 떠 있는 연출
+- 첨단 기술과 미래 지향적인 분위기를 주는 딥 블루 & 네온 사이언 톤의 조명
+- **중요**: 이미지 중앙과 좌측에는 굵은 텍스트를 나중에 따로 추가할 예정이니, 시선이 분산되지 않도록 시원하게 비워둘 것 (여백 확보)
+- 이미지 자체에는 어떠한 글자나 알파벳도 절대 넣지 말 것
+- 화면 비율: 16:9</div>
+        </div>
+        
+        <div class="how-to">
+            <strong>💡 실전 활용 가이드</strong>
+            <ul>
+                <li>AI는 텍스트 렌더링에 취약하므로 <strong>"글자를 넣지 말 것"</strong>, <strong>"여백을 둘 것"</strong>을 강조하여 배경 이미지만 얻은 뒤 캔바(Canva) 등에서 글자를 올리는 것이 좋습니다.</li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="section">
+        <h2><span class="icon">⏰</span> 13. 주기적 정보 큐레이션 (예약 작업)</h2>
+        <div class="purpose">▶ 최신 동향을 놓치지 않도록 정기적으로 뉴스/정보를 요약받기</div>
+        
+        <div class="prompt-wrapper">
+            <button class="copy-btn" onclick="copyPrompt(this)">복사하기 📋</button>
+            <div class="prompt-box">앞으로 매주 월요일 오전 8시에, 지난 일주일간 발표된 'AI 업무 자동화' 및 '크리에이터 생태계' 관련 글로벌 핵심 뉴스 3가지를 찾아서 브리핑해줘.
+
+각 뉴스마다 아래 항목을 요약할 것:
+1. 뉴스 3줄 요약
+2. 이 뉴스가 실무자/크리에이터에게 미치는 파급력
+3. 이 뉴스를 기반으로 당장 만들 수 있는 유튜브 콘텐츠 기획 아이디어 1가지</div>
+        </div>
+        
+        <div class="how-to">
+            <strong>💡 실전 활용 가이드</strong>
+            <ul>
+                <li>관심 있는 분야의 <strong>[키워드]</strong>를 변경하여 나만의 정기 구독 비서를 만들어보세요.</li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="section">
+        <h2><span class="icon">🎶</span> 14. 무드 기반 배경음악(BGM) 프롬프트</h2>
+        <div class="purpose">▶ 영상의 톤앤매너를 결정짓는 맞춤형 오디오 트랙 텍스트 묘사</div>
+        
+        <div class="prompt-wrapper">
+            <button class="copy-btn" onclick="copyPrompt(this)">복사하기 📋</button>
+            <div class="prompt-box">AI 자동화 튜토리얼 영상의 오프닝에 어울리는 30초짜리 인스트루멘탈(보컬 없는) BGM을 만들어줘.
+
+사운드 디자인 가이드:
+- 무드: 복잡한 문제가 빠르게 해결되는 듯한 경쾌함, 미래적, 세련됨, 산뜻함
+- 장르: 업템포 칠웨이브(Chillwave) / 미니멀 신스팝 / 테크 기업 홍보영상 스타일
+- 악기 구성: 맑고 몽환적인 신시사이저 아르페지오 리드, 리듬감 있는 가벼운 베이스라인, 둔탁하지 않고 경쾌한 전자 드럼 비트
+- 특징: 화자가 말을 할 때 방해되지 않도록 메인 멜로디 라인이 너무 튀지 않게 조율할 것</div>
+        </div>
+        
+        <div class="how-to">
+            <strong>💡 실전 활용 가이드</strong>
+            <ul>
+                <li>이 프롬프트는 Suno, Udio 같은 AI 음악 생성 도구에 직접 넣거나, 제미나이에게 이 지시문을 바탕으로 더 상세한 음악 프롬프트를 짜달라고 요청할 때 유용합니다.</li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="section bonus">
+        <h2><span class="icon">✅</span> 보너스. 철통 방어 검수 프롬프트 3종</h2>
+        <div class="purpose">▶ AI가 만든 결과물의 환각(Hallucination)을 잡아내고 퀄리티를 최종 검증</div>
+        
+        <h3 class="bonus-title">[1] 사실 확인 (Fact-Check) 검수기</h3>
+        <div class="prompt-wrapper">
+            <button class="copy-btn" onclick="copyPrompt(this)">복사하기 📋</button>
+            <div class="prompt-box">위에서 네가 작성한 답변에서 객관적인 팩트 체크가 필요한 문장들만 따로 발췌해줘.
+특히 아래 5가지 항목이 포함된 문장은 무조건 도마 위에 올려줘.
+(숫자/통계, 특정 날짜, 정책 및 요금제, 고유명사, 출처가 불분명한 단정적 주장)
+
+검수 리포트 양식 (표로 작성):
+- AI 원문 문장
+- 팩트 체크가 필요한 이유
+- 교차 검증 방법 제안
+- 환각(위험도): 상/중/하</div>
+        </div>
+
+        <h3 class="bonus-title">[2] 과대광고/어그로 필터링</h3>
+        <div class="prompt-wrapper">
+            <button class="copy-btn" onclick="copyPrompt(this)">복사하기 📋</button>
+            <div class="prompt-box">이 스크립트에서 시청자에게 오해를 주거나 지나치게 과장된 표현을 싹 다 찾아내줘.
+(예: '무조건 된다', '100% 보장', '아무나 월 천 번다', 조건부인데 무조건인 것처럼 쓴 문장 등)
+
+수정 리포트 양식:
+- 문제가 되는 원문
+- 왜 위험하거나 신뢰도를 떨어뜨리는지 이유
+- 현실적이면서도 여전히 매력적인 수정 제안 문장</div>
+        </div>
+
+        <h3 class="bonus-title">[3] 기획 의도 얼라인먼트 (Alignment) 체크</h3>
+        <div class="prompt-wrapper">
+            <button class="copy-btn" onclick="copyPrompt(this)">복사하기 📋</button>
+            <div class="prompt-box">내가 처음 요청했던 의도와 현재 결과물을 비교해서, 엇나간 부분이 있는지 냉정하게 검수해줘.
+
+체크리스트:
+1. 초보자 타겟인데 너무 어려운 전문 용어가 쓰이지 않았는가?
+2. 핵심 노하우보다 불필요한 서론이 길지 않은가?
+3. 내가 지정한 출력 포맷(표, 개요 등)을 완벽히 지켰는가?
+4. 실무에서 적용할 때 부딪힐 수 있는 한계점이나 단점이 누락되지 않았는가?
+
+위 기준을 바탕으로 부족한 점을 지적하고, 해당 부분만 다시 재작성해줘.</div>
+        </div>
+
+        <div class="how-to">
+            <strong>💡 실전 활용 가이드</strong>
+            <ul>
+                <li>AI가 긴 글이나 대본을 써주면, 이 세 가지 프롬프트를 복사해 순차적으로 질문을 던져보세요. AI 스스로 본인의 오류를 잡아내고 결과물을 훨씬 정교하게 다듬어 냅니다.</li>
+            </ul>
+        </div>
+    </div>
+
+</div>
+
+<script>
+    function copyPrompt(button) {
+        // 버튼 바로 다음 요소인 prompt-box의 텍스트를 가져옵니다.
+        const promptText = button.nextElementSibling.innerText;
+        
+        // 클립보드에 복사
+        navigator.clipboard.writeText(promptText).then(() => {
+            // 버튼 상태 시각적 변경
+            const originalText = button.innerText;
+            button.innerText = "복사 완료! ✅";
+            button.classList.add('copied');
+            
+            // 2초 후 원래 상태로 복귀
+            setTimeout(() => {
+                button.innerText = "복사하기 📋";
+                button.classList.remove('copied');
+            }, 2000);
+        }).catch(err => {
+            console.error('복사 실패:', err);
+            button.innerText = "복사 실패 ❌";
+        });
+    }
+</script>
+
+</body>
+</html>
