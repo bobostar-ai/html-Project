@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PYH AI 커뮤니티 로고 뷰어</title>
+    <style>
+        :root {
+            --bg-color: #0f172a;
+            --card-bg: #1e293b;
+            --card-border: #334155;
+            --text-main: #f8fafc;
+            --text-sub: #94a3b8;
+            --accent-blue: #0284c7;
+            --accent-glow: rgba(2, 132, 199, 0.25);
+            --checker-c1: #1e293b;
+            --checker-c2: #0f172a;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Pretendard", sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            min-height: 100vh;
+            padding: 40px 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 35px;
+            max-width: 800px;
+        }
+
+        header h1 {
+            font-size: 2.2rem;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+            background: linear-gradient(135deg, #ffffff 0%, #38bdf8 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 10px;
+        }
+
+        header p {
+            color: var(--text-sub);
+            font-size: 1rem;
+        }
+
+        /* 컨트롤 바 */
+        .controls-bar {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            justify-content: center;
+            align-items: center;
+            background: rgba(30, 41, 59, 0.7);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--card-border);
+            padding: 10px 20px;
+            border-radius: 9999px;
+            margin-bottom: 35px;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3);
+        }
+
+        .btn-group {
+            display: flex;
+            background: #0f172a;
+            padding: 4px;
+            border-radius: 9999px;
+            border: 1px solid #334155;
+        }
+
+        .btn-toggle {
+            background: transparent;
+            border: none;
+            color: var(--text-sub);
+            padding: 6px 14px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            border-radius: 9999px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .btn-toggle.active {
+            background: var(--accent-blue);
+            color: #ffffff;
+            box-shadow: 0 0 12px var(--accent-glow);
+        }
+
+        /* 갤러리 그리드 */
+        .gallery-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(460px, 1fr));
+            gap: 28px;
+            width: 100%;
+            max-width: 1200px;
+        }
+
+        .card {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 15px 30px -10px rgba(0, 0, 0, 0.4);
+            display: flex;
+            flex-direction: column;
+            transition: transform 0.25s ease, box-shadow 0.25s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 20px 35px -8px rgba(2, 132, 199, 0.15);
+            border-color: #475569;
+        }
+
+        .card-header {
+            padding: 18px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--card-border);
+            background: rgba(15, 23, 42, 0.5);
+        }
+
+        .card-title-group h3 {
+            font-size: 1.15rem;
+            font-weight: 600;
+            color: #f1f5f9;
+        }
+
+        .card-badge {
+            display: inline-block;
+            font-size: 0.75rem;
+            padding: 2px 8px;
+            border-radius: 6px;
+            font-weight: 600;
+            margin-top: 4px;
+        }
+
+        .badge-solid {
+            background: #1e3a8a;
+            color: #93c5fd;
+        }
+
+        .badge-transparent {
+            background: #065f46;
+            color: #6ee7b7;
+        }
+
+        .preview-box {
+            height: 320px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 24px;
+            position: relative;
+            overflow: hidden;
+            cursor: zoom-in;
+            transition: background 0.3s ease;
+        }
+
+        /* 배경 테마 */
+        .preview-box.bg-checker {
+            background-image: linear-gradient(45deg, var(--checker-c1) 25%, transparent 25%), 
+                              linear-gradient(-45deg, var(--checker-c1) 25%, transparent 25%), 
+                              linear-gradient(45deg, transparent 75%, var(--checker-c1) 75%), 
+                              linear-gradient(-45deg, transparent 75%, var(--checker-c1) 75%);
+            background-size: 20px 20px;
+            background-position: 0 0, 0 10px, 10px -10px, -10px 0px;
+            background-color: var(--checker-c2);
+        }
+
+        .preview-box.bg-white {
+            background-color: #ffffff !important;
+            background-image: none !important;
+        }
+
+        .preview-box.bg-dark {
+            background-color: #090d16 !important;
+            background-image: none !important;
+        }
+
+        .preview-box.bg-gray {
+            background-color: #e2e8f0 !important;
+            background-image: none !important;
+        }
+
+        .preview-box img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+            filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.15));
+            transition: transform 0.3s cubic-bezier(0.2, 0, 0, 1);
+        }
+
+        .preview-box:hover img {
+            transform: scale(1.04);
+        }
+
+        .card-footer {
+            padding: 16px 24px;
+            background: rgba(15, 23, 42, 0.4);
+            border-top: 1px solid var(--card-border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.85rem;
+            color: var(--text-sub);
+        }
+
+        .action-btn {
+            background: #2563eb;
+            color: #ffffff;
+            text-decoration: none;
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-weight: 500;
+            font-size: 0.85rem;
+            transition: background 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .action-btn:hover {
+            background: #1d4ed8;
+        }
+
+        /* 팝업 모달 */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(3, 7, 18, 0.85);
+            backdrop-filter: blur(8px);
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .modal.open {
+            display: flex;
+        }
+
+        .modal-content {
+            position: relative;
+            max-width: 90vw;
+            max-height: 85vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content img {
+            max-width: 100%;
+            max-height: 85vh;
+            object-fit: contain;
+            border-radius: 12px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
+        }
+
+        .close-btn {
+            position: absolute;
+            top: 25px;
+            right: 30px;
+            color: #ffffff;
+            font-size: 32px;
+            font-weight: bold;
+            cursor: pointer;
+            width: 44px;
+            height: 44px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            transition: background 0.2s;
+        }
+
+        .close-btn:hover {
+            background: rgba(255, 255, 255, 0.25);
+        }
+
+        @media (max-width: 600px) {
+            .gallery-container {
+                grid-template-columns: 1fr;
+            }
+            .preview-box {
+                height: 240px;
+            }
+            header h1 {
+                font-size: 1.7rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>AI 로고 디자인 뷰어</h1>
+        <p>동일 폴더 내의 로고 이미지 파일(PYH Ai Comm.png / 필요한 Ai Comm 투명.png)을 연동하여 비교합니다.</p>
+    </header>
+
+    <div class="controls-bar">
+        <span style="font-size: 0.85rem; color: var(--text-sub); font-weight: 500;">배경 모드 선택:</span>
+        <div class="btn-group">
+            <button class="btn-toggle active" onclick="changeBg('bg-checker')">격자 (투명도 확인)</button>
+            <button class="btn-toggle" onclick="changeBg('bg-white')">화이트</button>
+            <button class="btn-toggle" onclick="changeBg('bg-dark')">다크</button>
+            <button class="btn-toggle" onclick="changeBg('bg-gray')">라이트 그레이</button>
+        </div>
+    </div>
+
+    <main class="gallery-container">
+        <!-- 카드 1: PYH AI COMMUNITY -->
+        <div class="card">
+            <div class="card-header">
+                <div class="card-title-group">
+                    <h3>1. PYH AI COMMUNITY</h3>
+                    <span class="card-badge badge-solid">영문 메인 로고</span>
+                </div>
+            </div>
+            <div class="preview-box bg-checker" id="box-0" onclick="openModal('img-0')">
+                <img id="img-0" src="PYH%20Ai%20Comm.png" alt="PYH Ai Comm.png" title="클릭하여 크게 보기">
+            </div>
+            <div class="card-footer">
+                <span>파일: PYH Ai Comm.png</span>
+                <a class="action-btn" href="PYH%20Ai%20Comm.png" download="PYH Ai Comm.png">
+                    <span>원본 다운로드</span>
+                </a>
+            </div>
+        </div>
+
+        <!-- 카드 2: 필요한 AI COMMUNITY (투명 배경) -->
+        <div class="card">
+            <div class="card-header">
+                <div class="card-title-group">
+                    <h3>2. 필요한 AI COMMUNITY</h3>
+                    <span class="card-badge badge-transparent">한글 투명 배경 로고</span>
+                </div>
+            </div>
+            <div class="preview-box bg-checker" id="box-1" onclick="openModal('img-1')">
+                <img id="img-1" src="%ED%95%84%EC%9A%94%ED%95%9C%20Ai%20Comm%20%ED%88%AC%EB%AA%85.png" alt="필요한 Ai Comm 투명.png" title="클릭하여 크게 보기">
+            </div>
+            <div class="card-footer">
+                <span>파일: 필요한 Ai Comm 투명.png</span>
+                <a class="action-btn" href="%ED%95%84%EC%9A%94%ED%95%9C%20Ai%20Comm%20%ED%88%AC%EB%AA%85.png" download="필요한 Ai Comm 투명.png">
+                    <span>원본 다운로드</span>
+                </a>
+            </div>
+        </div>
+    </main>
+
+    <!-- 이미지 확대 모달 -->
+    <div id="imageModal" class="modal" onclick="closeModal()">
+        <span class="close-btn">&times;</span>
+        <div class="modal-content" onclick="event.stopPropagation()">
+            <img id="modalImg" src="" alt="확대 이미지">
+        </div>
+    </div>
+
+    <script>
+        function changeBg(bgClass) {
+            const boxes = [document.getElementById('box-0'), document.getElementById('box-1')];
+            const buttons = document.querySelectorAll('.btn-toggle');
+            
+            buttons.forEach(btn => {
+                if (btn.getAttribute('onclick').includes(bgClass)) {
+                    btn.classList.add('active');
+                } else {
+                    btn.classList.remove('active');
+                }
+            });
+
+            boxes.forEach(box => {
+                box.className = 'preview-box ' + bgClass;
+            });
+        }
+
+        function openModal(imgId) {
+            const modal = document.getElementById('imageModal');
+            const modalImg = document.getElementById('modalImg');
+            const targetImg = document.getElementById(imgId);
+            modalImg.src = targetImg.src;
+            modal.classList.add('open');
+        }
+
+        function closeModal() {
+            const modal = document.getElementById('imageModal');
+            modal.classList.remove('open');
+        }
+
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') closeModal();
+        });
+    </script>
+</body>
+</html>
