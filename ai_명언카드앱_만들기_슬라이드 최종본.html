@@ -1,0 +1,1700 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>열린강좌 2탄 — AI 명언 카드 앱 만들기: Vibe Coding | Connect AI</title>
+<meta name="description" content="코딩 없이 만드는 나만의 명언 카드 생성 앱. 바이브 코딩으로 뼈대부터 이미지 저장 기능까지 완성합니다.">
+<!-- Pretendard 고급 웹폰트 불러오기 -->
+<link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css" />
+<style>
+  /* 
+    ==========================================================================
+    🎨 현대적이고 미니멀한 하이엔드 테크 다크 시스템 (Modern Minimalist Dark Design System)
+    - Base: Midnight Obsidian (#090D16) & Slate Gray (#111827)
+    - Accent Primary: Electric Indigo (#6366F1 / #818CF8)
+    - Accent Cyan: Sky Cyan (#38BDF8)
+    - Accent Red / Crimson: Vivid Rose Red (#F43F5E / #EF4444)
+    - Accent Orange: Vibrant Orange (#F97316 / #FB923C)
+    ==========================================================================
+  */
+  :root { 
+    --bg: #090D16; 
+    --panel: #111827; 
+    --panel-card: #1F2937;
+    --panel-card-hover: #374151;
+    --line: rgba(255, 255, 255, 0.08); 
+    --line-accent: rgba(99, 102, 241, 0.3);
+    --txt: #F9FAFB; 
+    --muted: #9CA3AF; 
+    --dim: #6B7280;
+    --primary: #6366F1; /* Modern Indigo Glow */
+    --primary-light: #818CF8;
+    --accent: #38BDF8; /* Sky Cyan Electric */
+    --rose: #F43F5E; /* Accent Red */
+    --rose-bright: #FF2E55;
+    --orange: #F97316; /* Vibrant Orange */
+    --orange-bright: #FB923C;
+    --success: #10B981;
+    --card-shadow: rgba(0, 0, 0, 0.5);
+  }
+
+  /* 주간(라이트) 미니멀 세련된 클린 테마 */
+  body.light-mode {
+    --bg: #F8FAFC;
+    --panel: #FFFFFF;
+    --panel-card: #F1F5F9;
+    --panel-card-hover: #E2E8F0;
+    --line: #E2E8F0;
+    --line-accent: rgba(99, 102, 241, 0.4);
+    --txt: #0F172A;
+    --muted: #475569;
+    --dim: #64748B;
+    --primary: #4F46E5;
+    --primary-light: #6366F1;
+    --accent: #0284C7;
+    --rose: #E11D48;
+    --rose-bright: #F43F5E;
+    --orange: #EA580C;
+    --orange-bright: #F97316;
+    --card-shadow: rgba(15, 23, 42, 0.08);
+  }
+
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body { 
+    margin: 0; 
+    background: var(--bg); 
+    color: var(--txt); 
+    overflow-x: hidden; 
+    scroll-snap-type: y proximity;
+    font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; 
+    -webkit-font-smoothing: antialiased;
+    letter-spacing: -0.3px;
+    transition: background-color .3s ease, color .3s ease;
+  }
+  a { color: var(--accent); text-decoration: none; }
+
+  /* Remotion 은은하고 몽환적인 소프트 오로라 백그라운드 (불투명도 0.55) */
+  #remotion-canvas {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: 0;
+    pointer-events: none;
+    opacity: 0.55; 
+    transition: opacity .5s ease;
+  }
+
+  /* 상단 실시간 슬림 프로그레스 바 */
+  .progress { 
+    position: fixed; 
+    top: 0; 
+    left: 0; 
+    height: 3px; 
+    width: 0; 
+    background: linear-gradient(90deg, var(--primary), var(--rose)); 
+    z-index: 99; 
+    transition: width .15s ease-out; 
+    box-shadow: 0 0 12px rgba(244, 63, 94, 0.8);
+  }
+
+  /* 미니멀 우측 고정 컨트롤러 툴바 + 슬라이드 퀵 네비게이터 드롭다운 */
+  .viewer-toolbar {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(17, 24, 39, 0.82);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid var(--line-accent);
+    border-radius: 9999px;
+    padding: 6px 14px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+  }
+  body.light-mode .viewer-toolbar {
+    background: rgba(255, 255, 255, 0.9);
+  }
+
+  /* 슬라이드 퀵 이동 드롭다운 셀렉터 */
+  .slide-select-nav {
+    background: #0B0F19;
+    color: var(--primary-light);
+    border: 1px solid var(--line-accent);
+    font-size: 13px;
+    font-weight: 700;
+    padding: 5px 12px;
+    border-radius: 9999px;
+    cursor: pointer;
+    outline: none;
+    font-family: inherit;
+    transition: all .2s ease;
+  }
+  .slide-select-nav:hover {
+    border-color: #818CF8;
+    box-shadow: 0 0 12px rgba(99, 102, 241, 0.35);
+  }
+  body.light-mode .slide-select-nav {
+    background: #F1F5F9;
+    color: #4F46E5;
+  }
+
+  .tool-btn {
+    background: transparent;
+    border: none;
+    color: var(--txt);
+    font-size: 13px;
+    font-weight: 600;
+    padding: 6px 12px;
+    border-radius: 9999px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    transition: all .2s cubic-bezier(0.4, 0, 0.2, 1);
+    font-family: inherit;
+  }
+  .tool-btn:hover {
+    background: var(--panel-card);
+    color: var(--accent);
+  }
+  .tool-btn.active {
+    background: var(--primary);
+    color: #ffffff !important;
+    box-shadow: 0 4px 14px rgba(99, 102, 241, 0.35);
+  }
+
+  /* 
+    ==========================================================================
+    📱 모바일 전용 / 모바일 뷰 활성화 시 화면 맨 아래(하단 고정) '이전 홈 다음' 컨트롤러
+    ==========================================================================
+  */
+  .mobile-bottom-bar {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 1000;
+    display: none; /* 기본 데스크톱에서는 숨김, 모바일 화면 및 모바일뷰에서 표시 */
+    align-items: center;
+    gap: 10px;
+    background: rgba(17, 24, 39, 0.88);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1.5px solid var(--line-accent);
+    border-radius: 9999px;
+    padding: 8px 18px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.7), 0 0 20px rgba(99, 102, 241, 0.3);
+  }
+  .mobile-bottom-bar .tool-btn {
+    background: var(--panel-card);
+    border: 1px solid var(--line);
+    color: var(--txt);
+    padding: 8px 18px;
+    font-size: 13.5px;
+    font-weight: 700;
+  }
+  .mobile-bottom-bar .tool-btn:hover, .mobile-bottom-bar .tool-btn:active {
+    background: var(--primary);
+    color: #fff;
+    border-color: transparent;
+    box-shadow: 0 0 12px rgba(99, 102, 241, 0.6);
+  }
+
+  /* 화면 폭 768px 이하(모바일)이거나 body.mobile-view 클래스 적용 시 하단 바 표시 */
+  @media(max-width: 768px) {
+    .mobile-bottom-bar { display: flex; }
+  }
+  body.mobile-view .mobile-bottom-bar {
+    display: flex !important;
+  }
+
+  /* 텍스트 그래디언트 및 미니멀 하이라이트 */
+  .gold { 
+    background: linear-gradient(135deg, #818CF8, #38BDF8); 
+    -webkit-background-clip: text; 
+    background-clip: text; 
+    color: transparent; 
+  }
+  .grad { 
+    background: linear-gradient(90deg, #818CF8, #38BDF8, #F43F5E, #818CF8); 
+    background-size: 300% 100%;
+    -webkit-background-clip: text; 
+    background-clip: text; 
+    color: transparent; 
+    animation: shine 6s linear infinite; 
+  }
+  @keyframes shine { to { background-position: 300% 0; } }
+
+  /* 100vh 슬라이드 레이아웃 */
+  .slide { 
+    min-height: 100vh; 
+    display: flex; 
+    flex-direction: column; 
+    justify-content: center; 
+    align-items: center;
+    text-align: center; 
+    padding: 60px 24px; 
+    position: relative; 
+    scroll-snap-align: start; 
+    border-bottom: 1px solid var(--line);
+    z-index: 1;
+  }
+  .inner { 
+    max-width: 1040px; 
+    width: 100%; 
+    opacity: 0; 
+    transform: translateY(20px); 
+    transition: opacity .7s ease, transform .8s cubic-bezier(.16, 1, .3, 1); 
+    position: relative;
+    z-index: 2;
+  }
+  .slide.in .inner { opacity: 1; transform: none; }
+
+  /* 타이틀 및 미니멀 폰트 어레인지 */
+  h2 { font-size: clamp(28px, 4.8vw, 44px); font-weight: 800; letter-spacing: -1.2px; line-height: 1.2; margin: 0; }
+  .sub { color: var(--muted); font-size: clamp(15px, 2vw, 18px); margin-top: 14px; line-height: 1.75; max-width: 800px; margin-left: auto; margin-right: auto; }
+  .sub b { color: var(--txt); font-weight: 700; }
+
+  /* 현대적 미니멀 뱃지 UI */
+  .pill { 
+    display: inline-flex; 
+    align-items: center;
+    gap: 6px;
+    font-size: 13px; 
+    font-weight: 600; 
+    color: var(--primary-light); 
+    border: 1px solid var(--line-accent); 
+    background: rgba(99, 102, 241, 0.08); 
+    padding: 6px 16px; 
+    border-radius: 9999px; 
+    margin-bottom: 20px; 
+  }
+  .chapter { 
+    display: inline-flex; 
+    align-items: center; 
+    gap: 8px; 
+    font-size: 12px; 
+    font-weight: 700; 
+    letter-spacing: 0.8px; 
+    color: var(--accent); 
+    border: 1px solid rgba(56, 189, 248, 0.3); 
+    background: rgba(56, 189, 248, 0.08); 
+    padding: 6px 14px; 
+    border-radius: 8px; 
+    text-transform: uppercase; 
+    margin-bottom: 20px; 
+  }
+
+  /* 강의 메타 정보 바 */
+  .class-meta {
+    margin-top: 24px;
+    display: inline-flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 16px 28px;
+    font-size: 14px;
+    color: var(--muted);
+    background: rgba(31, 41, 55, 0.4);
+    border: 1px solid var(--line);
+    border-radius: 9999px;
+    padding: 10px 28px;
+  }
+  .class-meta > div {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .class-meta b { color: var(--txt); }
+
+  /* 미니멀 KPI 카드 */
+  .kpis { display: flex; flex-wrap: wrap; gap: 14px; justify-content: center; margin-top: 28px; }
+  .kpi { 
+    background: var(--panel); 
+    border: 1px solid var(--line); 
+    border-radius: 12px; 
+    padding: 16px 26px; 
+    min-width: 160px; 
+    transition: all .3s cubic-bezier(.16, 1, .3, 1); 
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+  }
+  .kpi:hover { 
+    border-color: #818CF8; 
+    transform: translateY(-4px); 
+    box-shadow: 0 0 25px rgba(99, 102, 241, 0.35), 0 14px 28px rgba(0, 0, 0, 0.5); 
+  }
+  .kpi b { display: block; font-size: clamp(22px, 3.2vw, 28px); font-weight: 800; line-height: 1.1; color: var(--primary-light); } 
+  .kpi span { font-size: 12px; color: var(--muted); margin-top: 6px; display: block; }
+
+  /* 3컬럼 모듈 그리드 시스템 */
+  .three { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; margin: 28px auto 0; text-align: left; }
+  @media(max-width: 840px) { .three { grid-template-columns: 1fr; } }
+  
+  .tc { 
+    background: var(--panel); 
+    border: 1px solid var(--line); 
+    border-radius: 16px; 
+    padding: 26px; 
+    transition: transform .3s cubic-bezier(.16, 1, .3, 1), border-color .3s ease, box-shadow .3s ease; 
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3);
+  }
+  .tc:hover { 
+    transform: translateY(-6px); 
+    border-color: #818CF8; 
+    box-shadow: 0 0 25px rgba(99, 102, 241, 0.4), 0 16px 36px rgba(0, 0, 0, 0.6); 
+  }
+
+  .tc .tn { 
+    width: 40px; 
+    height: 40px; 
+    border-radius: 10px; 
+    background: rgba(99, 102, 241, 0.12); 
+    border: 1px solid var(--line-accent);
+    color: var(--primary-light); 
+    font-weight: 800; 
+    display: flex; 
+    align-items: center; 
+    justify-content: center; 
+    font-size: 18px; 
+  }
+  .tc.good .tn { background: rgba(56, 189, 248, 0.12); border-color: rgba(56, 189, 248, 0.3); color: var(--accent); }
+  .tc.blue-accent .tn { background: rgba(244, 63, 94, 0.12); border-color: rgba(244, 63, 94, 0.3); color: var(--rose); }
+  .tc h4 { font-size: 17px; font-weight: 700; margin: 16px 0 8px; color: var(--txt); } 
+  .tc p { font-size: 14px; color: var(--muted); line-height: 1.65; margin: 0; } 
+  .tc p b { color: var(--txt); }
+
+  /* 대화형 선택 대형 박스 */
+  .interactive-card {
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+    border: 1.5px solid var(--line-accent);
+  }
+  .interactive-card:hover {
+    transform: translateY(-4px);
+    border-color: #818CF8;
+    box-shadow: 0 0 30px rgba(99, 102, 241, 0.45), 0 20px 40px rgba(0, 0, 0, 0.65);
+  }
+
+  /* 팩트 블록 */
+  .fact { text-align: left; max-width: 850px; margin: 28px auto 0; display: grid; gap: 14px; }
+  .fact .f { 
+    background: var(--panel); 
+    border: 1px solid var(--line); 
+    border-left: 4px solid var(--primary); 
+    border-radius: 0 14px 14px 0; 
+    padding: 18px 24px; 
+    font-size: 15px; 
+    line-height: 1.65; 
+    box-shadow: 0 6px 16px rgba(0,0,0,0.3);
+    transition: all 0.3s ease;
+  }
+  .fact .f:hover {
+    border-color: #818CF8;
+    box-shadow: 0 0 20px rgba(99, 102, 241, 0.3), 0 10px 25px rgba(0,0,0,0.5);
+  }
+  .fact .f b { color: var(--primary-light); } 
+  .fact .f span { color: var(--muted); }
+
+  /* 디지털 타이머 박스 UI */
+  .timer-widget.large { 
+    display: flex; 
+    align-items: center; 
+    justify-content: space-between; 
+    gap: 20px; 
+    background: var(--panel); 
+    border: 1.5px solid var(--line-accent); 
+    border-radius: 16px; 
+    padding: 14px 24px; 
+    margin-top: 14px;
+    width: 100%;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.4);
+    transition: all 0.3s ease;
+  }
+  .timer-widget.large:hover {
+    border-color: #38BDF8;
+    box-shadow: 0 0 25px rgba(56, 189, 248, 0.35), 0 16px 36px rgba(0, 0, 0, 0.6);
+  }
+  .digital-clock-box {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: var(--bg);
+    border: 1px solid var(--line-accent);
+    border-radius: 12px;
+    padding: 8px 22px;
+    box-shadow: inset 0 2px 8px rgba(0,0,0,0.4);
+  }
+  .timer-widget.large .timer-time { 
+    font-size: 36px; 
+    font-weight: 800; 
+    color: var(--accent); 
+    font-family: 'Courier New', Courier, monospace; 
+    letter-spacing: 3px; 
+    line-height: 1;
+    text-shadow: 0 0 12px rgba(56, 189, 248, 0.5);
+  }
+  .timer-widget.large .tbtn { 
+    border: none; 
+    border-radius: 10px; 
+    padding: 10px 22px; 
+    font-size: 14px; 
+    font-weight: 700; 
+    cursor: pointer; 
+    font-family: inherit; 
+    transition: all 0.2s ease;
+  }
+  .timer-widget.large .tbtn.start {
+    background: var(--primary);
+    color: #ffffff;
+    box-shadow: 0 4px 14px rgba(99, 102, 241, 0.35);
+  }
+  .timer-widget.large .tbtn.start:hover {
+    background: var(--primary-light);
+    box-shadow: 0 0 15px rgba(99, 102, 241, 0.6);
+  }
+  .timer-widget.large .tbtn.reset {
+    background: var(--panel-card);
+    color: var(--txt);
+    border: 1px solid var(--line);
+  }
+  .timer-widget.large .tbtn:active { transform: scale(0.97); }
+
+  /* 프롬프트/코드 터미널 스타일 박스 */
+  .doc { 
+    max-width: 720px; 
+    width: 100%; 
+    margin: 0 auto; 
+    background: #0B0F19; 
+    border: 1.5px solid var(--line-accent); 
+    border-radius: 14px; 
+    padding: 18px; 
+    text-align: left; 
+    box-shadow: 0 12px 30px rgba(0,0,0,0.5); 
+    color: var(--txt); 
+    position: relative; 
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .doc:hover, .doc.selected {
+    border-color: #818CF8;
+    box-shadow: 0 0 30px rgba(99, 102, 241, 0.4), 0 20px 45px rgba(0, 0, 0, 0.7);
+  }
+  .doc .dtag { 
+    font-size: 11px; 
+    font-weight: 700; 
+    color: var(--accent); 
+    letter-spacing: .5px; 
+    text-transform: uppercase; 
+    border: 1px solid rgba(56, 189, 248, 0.3); 
+    background: rgba(56, 189, 248, 0.08);
+    padding: 4px 10px; 
+    border-radius: 6px; 
+    display: inline-block; 
+    margin-bottom: 10px; 
+  }
+  .doc h4 { font-size: 15px; font-weight: 700; margin: 0 0 10px; color: var(--txt); line-height: 1.35; }
+  .doc pre { 
+    background: var(--panel); 
+    padding: 14px 16px; 
+    border-radius: 10px; 
+    overflow-x: auto; 
+    font-size: 13.5px; 
+    color: var(--primary-light); 
+    border: 1px solid var(--line); 
+    margin: 0; 
+    font-family: monospace; 
+    white-space: pre-wrap;
+    word-break: break-all;
+    line-height: 1.6;
+  }
+
+  /* 💡 왕초보 쉬운 지시 팁 유리질 카드 */
+  .easy-prompt-card {
+    margin-top: 14px;
+    background: rgba(31, 41, 55, 0.5);
+    border: 1.5px solid var(--line-accent);
+    border-radius: 12px;
+    padding: 14px 18px;
+    font-size: 14px;
+    color: var(--txt);
+    line-height: 1.65;
+    text-align: left;
+    box-shadow: 0 6px 18px rgba(0,0,0,0.3);
+    transition: all 0.3s ease;
+  }
+  .easy-prompt-card:hover {
+    border-color: #818CF8;
+    box-shadow: 0 0 25px rgba(99, 102, 241, 0.35), 0 14px 30px rgba(0,0,0,0.5);
+  }
+  .easy-prompt-card b {
+    color: var(--accent);
+    font-weight: 700;
+  }
+  .easy-prompt-card span {
+    color: var(--txt);
+    font-weight: 600;
+  }
+
+  .doc-btn-group {
+    position: absolute; 
+    top: 18px; 
+    right: 18px; 
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .doc .copy-btn, .doc .zoom-btn { 
+    background: var(--panel); 
+    color: var(--txt); 
+    border: 1px solid var(--line); 
+    padding: 6px 12px; 
+    border-radius: 8px; 
+    font-size: 12px; 
+    cursor: pointer; 
+    font-weight: 600; 
+    transition: all .2s ease; 
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-family: inherit;
+  }
+  .doc .copy-btn:hover, .doc .zoom-btn:hover { background: var(--primary); color: #fff; border-color: transparent; box-shadow: 0 0 12px rgba(99, 102, 241, 0.6); }
+
+  /* 15번 슬라이드 다음 특강 안내 박스 (오렌지 하이라이트 & 대형 타이틀 보정) */
+  .next-class-box {
+    text-align: center; 
+    background: rgba(31, 41, 55, 0.35); 
+    border: 1.5px solid rgba(249, 115, 22, 0.4); 
+    padding: 38px 32px 42px; 
+    border-radius: 20px;
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+  }
+  .next-class-box:hover {
+    border-color: var(--orange-bright);
+    box-shadow: 0 0 35px rgba(249, 115, 22, 0.4), 0 20px 45px rgba(0, 0, 0, 0.7);
+    transform: translateY(-4px);
+  }
+
+  /* 15페이지 대형 굵은 오렌지 특강 타이틀 */
+  .next-class-title {
+    font-size: clamp(26px, 4vw, 34px);
+    font-weight: 900;
+    color: var(--orange-bright);
+    letter-spacing: -0.8px;
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    text-shadow: 0 0 16px rgba(249, 115, 22, 0.4);
+  }
+
+  /* 프롬프트 확대 모달 팝업 UI */
+  #prompt-modal {
+    position: fixed;
+    inset: 0;
+    background: rgba(9, 13, 22, 0.92);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    z-index: 10000;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+  }
+  #prompt-modal.show {
+    display: flex;
+  }
+  .modal-box {
+    background: var(--panel);
+    border: 2px solid #818CF8;
+    border-radius: 20px;
+    max-width: 920px;
+    width: 100%;
+    padding: 32px;
+    box-shadow: 0 0 40px rgba(99, 102, 241, 0.4), 0 30px 60px rgba(0,0,0,0.9);
+    text-align: left;
+    position: relative;
+  }
+  .modal-box h3 {
+    font-size: 22px;
+    font-weight: 800;
+    color: var(--primary-light);
+    margin: 0 0 18px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .modal-box pre {
+    background: #0B0F19;
+    border: 1px solid var(--line);
+    padding: 22px;
+    border-radius: 14px;
+    font-size: clamp(16px, 2.2vw, 21px);
+    line-height: 1.7;
+    color: var(--accent);
+    white-space: pre-wrap;
+    word-break: break-all;
+    font-family: 'Pretendard', monospace;
+    max-height: 45vh;
+    overflow-y: auto;
+  }
+  .modal-close-btn {
+    background: var(--panel-card);
+    border: 1px solid var(--line);
+    color: var(--txt);
+    font-size: 14px;
+    font-weight: 700;
+    padding: 8px 18px;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all .2s;
+  }
+  .modal-close-btn:hover {
+    background: var(--primary);
+    color: #fff;
+  }
+
+  /* 
+    ==========================================================================
+    🔴 우측 네비게이터: 얇은 가로형 레드 라인 (Thin Horizontal Red Line)
+    ==========================================================================
+  */
+  .dots { 
+    position: fixed; 
+    right: 22px; 
+    top: 50%; 
+    transform: translateY(-50%); 
+    z-index: 60; 
+    display: flex; 
+    flex-direction: column; 
+    gap: 9px; 
+    align-items: flex-end;
+  }
+  .dots a { 
+    width: 18px; 
+    height: 2.5px; 
+    border-radius: 9999px; 
+    background: rgba(244, 63, 94, 0.35); /* 은은한 트랜스루센트 레드 */
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1); 
+    display: block; 
+    position: relative;
+  }
+  .dots a:hover {
+    background: var(--rose-bright);
+    width: 24px;
+    height: 3px;
+    box-shadow: 0 0 10px rgba(255, 46, 85, 0.8);
+  }
+  .dots a.on { 
+    background: var(--rose-bright); 
+    width: 32px;
+    height: 3.5px;
+    box-shadow: 0 0 14px rgba(255, 46, 85, 1); 
+  }
+  .dots a::after {
+    content: attr(data-title);
+    position: absolute;
+    right: 24px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: rgba(17, 24, 39, 0.92);
+    border: 1px solid rgba(244, 63, 94, 0.4);
+    color: var(--txt);
+    font-size: 11px;
+    font-weight: 700;
+    padding: 4px 10px;
+    border-radius: 6px;
+    white-space: nowrap;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s ease, transform 0.2s ease;
+    box-shadow: 0 4px 14px rgba(0,0,0,0.5);
+  }
+  .dots a:hover::after {
+    opacity: 1;
+    transform: translateY(-50%) translateX(-4px);
+  }
+  @media(max-width: 768px) { .dots { display: none; } }
+
+  /* 하단 스크롤 힌트 */
+  .hint { 
+    position: fixed; 
+    bottom: 24px; 
+    left: 50%; 
+    transform: translateX(-50%); 
+    color: var(--dim); 
+    font-size: 12px; 
+    letter-spacing: 1px; 
+    z-index: 60; 
+    animation: bob 2s ease-in-out infinite; 
+  }
+  @keyframes bob { 
+    0%, 100% { transform: translateX(-50%) translateY(0); } 
+    50% { transform: translateX(-50%) translateY(6px); } 
+  }
+
+  /* 토스트 알림 팝업 */
+  #toast-message { 
+    position: fixed; 
+    top: 24px; 
+    left: 50%; 
+    transform: translateX(-50%) translateY(-20px); 
+    background: var(--primary); 
+    color: white; 
+    font-weight: 700; 
+    padding: 12px 26px; 
+    border-radius: 9999px; 
+    box-shadow: 0 10px 30px rgba(99, 102, 241, 0.4); 
+    opacity: 0; 
+    pointer-events: none; 
+    transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1); 
+    z-index: 9999; 
+    display: flex; 
+    align-items: center; 
+    gap: 8px; 
+  }
+  #toast-message.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+  /* 12페이지 전용 마우스 롤오버 호버 전용 동적 스타일 */
+  .prompt-bad-box {
+    border: 1px solid var(--line) !important;
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
+  }
+  .prompt-bad-box:hover {
+    border-color: rgba(244, 63, 94, 0.8) !important;
+    box-shadow: 0 0 25px rgba(244, 63, 94, 0.4), 0 16px 36px rgba(0, 0, 0, 0.6) !important;
+    transform: translateY(-4px) !important;
+  }
+
+  .prompt-good-box {
+    border: 1px solid var(--line) !important;
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
+  }
+  .prompt-good-box:hover {
+    border-color: #818CF8 !important;
+    box-shadow: 0 0 25px rgba(99, 102, 241, 0.4), 0 16px 36px rgba(0, 0, 0, 0.6) !important;
+    transform: translateY(-4px) !important;
+  }
+</style>
+</head>
+<body>
+
+<!-- Remotion 몽환적 오로라 백그라운드 캔버스 -->
+<canvas id="remotion-canvas"></canvas>
+
+<!-- 상단 실시간 진행 표시줄 -->
+<div class="progress" id="pbar"></div>
+
+<!-- 우측 얇은 가로형 레드 라인 네비게이터 -->
+<div class="dots" id="dots"></div>
+
+<!-- 하단 스크롤 힌트 -->
+<div class="hint">스크롤 ↓</div>
+
+<!-- 상단 우측 고정 뷰어 컨트롤 툴바 (슬라이드 퀵 이동 셀렉트 박스 포함) -->
+<div class="viewer-toolbar">
+  <!-- 퀵 슬라이드 네비게이션 셀렉트 -->
+  <select class="slide-select-nav" id="slide-select-nav" onchange="goToSlide(parseInt(this.value, 10))" title="원하는 슬라이드로 바로 이동">
+    <option value="1">01. 표지 (AI 명언 카드)</option>
+    <option value="2">02. 강의 목표 (실용 웹앱)</option>
+    <option value="3">03. 바이브 코딩이란?</option>
+    <option value="4">04. 바이브코딩 3대 원칙</option>
+    <option value="5">05. 실습 진행 단계 (4단계)</option>
+    <option value="6">06. [실습 1] 카드 틀 만들기</option>
+    <option value="7">07. [실습 2] 랜덤 명언 연동</option>
+    <option value="8">08. [실습 3] 디자인 꾸미기</option>
+    <option value="9">09. [실습 4] 이미지 저장 기능</option>
+    <option value="10">10. [실습 5] 내 사진 배경 넣기</option>
+    <option value="11">11. AI 대화창 200% 활용 꿀팁</option>
+    <option value="12">12. 좋은 vs 나쁜 프롬프트</option>
+    <option value="13">13. 나만의 첫 응용 프로젝트</option>
+    <option value="14">14. 오늘 배운 성과 마무리</option>
+    <option value="15">15. 수고하셨습니다 👏 (다음 특강)</option>
+  </select>
+
+  <button class="tool-btn" id="btn-theme" title="야간/주간 테마 전환">☀️/🌙 <span>야간</span></button>
+  <button class="tool-btn" id="btn-fullscreen" title="전체화면 켜기/끄기">🖥️ <span>전체화면</span></button>
+  <button class="tool-btn" id="btn-mobile-view" title="모바일앱 최적화 뷰">📱 <span>모바일뷰</span></button>
+</div>
+
+<!-- 모바일 전용 / 모바일뷰 활성화 시 화면 맨 아래(하단 고정) '이전 홈 다음' 컨트롤러 바 -->
+<div class="mobile-bottom-bar" id="mobile-bottom-bar">
+  <button class="tool-btn" onclick="prevSlide()">◀ 이전</button>
+  <button class="tool-btn" onclick="goToSlide(1)">🏠 홈</button>
+  <button class="tool-btn" onclick="nextSlide()">다음 ▶</button>
+</div>
+
+<!-- 01. 표지 -->
+<section class="slide cover" data-title="01. 표지">
+  <div class="inner">
+    <div class="chapter">🎓 열린강좌 2탄 · 코딩 없는 실용 앱 만들기</div>
+    <h1 style="font-size: clamp(32px, 5.5vw, 60px); font-weight: 900; margin: 0 0 16px; letter-spacing: -1.5px;">AI로 만드는 나만의 명언카드 앱</h1>
+    <h3 class="grad" style="font-size: clamp(16px, 3vw, 24px); font-weight: 800; margin: 0 0 24px; letter-spacing: 1px;">제미나이·ChatGPT·클로드 기반 바이브코딩 실습</h3>
+    
+    <div class="class-meta">
+      <div>📅 <b>일시:</b> 2026.07.30 (목) 오후 4시~6시</div>
+      <div>📍 <b>장소:</b> 전태일기념관 4층 교육실</div>
+      <div>👨‍🏫 <b>강사:</b> 서현(필요한 AI 커뮤니티)</div>
+    </div>
+    
+    <div class="kpis">
+      <div class="kpi"><b class="gold">5단계 실습</b><span>따라하며 배우는 순서</span></div>
+      <div class="kpi"><b class="gold">AI 대화창 코딩</b><span>코딩 지식 전혀 불필요</span></div>
+      <div class="kpi"><b class="gold">실제 앱 완성</b><span>나만의 카드 발송 웹앱</span></div>
+    </div>
+
+    <!-- 주최 및 장소 공식 로고 (margin-top: 152px 유지) -->
+    <div style="display: flex; align-items: center; justify-content: center; gap: 16px; margin-top: 152px; flex-wrap: wrap;">
+      <div style="background: rgba(255, 255, 255, 0.95); padding: 8px 18px; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.2); display: flex; align-items: center; justify-content: center; height: 52px;">
+        <img src="./필요한 Ai Comm 투명.png" alt="필요한 AI 커뮤니티" style="height: 36px; width: auto; object-fit: contain;" />
+      </div>
+      <div style="background: rgba(255, 255, 255, 0.95); padding: 8px 18px; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.2); display: flex; align-items: center; justify-content: center; height: 52px;">
+        <img src="https://cdn-taeil.ictact.kr/assets/img/introduction/wordmark-3.png" alt="전태일기념관" style="max-height: 24px; width: auto; object-fit: contain;" />
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 02. 오늘 목표 -->
+<section class="slide" data-title="02. 강의 목표">
+  <div class="inner">
+    <div class="pill">🎯 강의 목표</div>
+    <h2>오늘은 코딩을 배우는 시간이 아닙니다.</h2>
+    <p class="sub" style="font-size: 20px; font-weight: 700; margin-bottom: 28px;">"나에게 필요한 실용 웹앱을 AI 대화만으로 완성하는 날입니다."</p>
+    <div class="three" style="max-width: 850px; margin: 0 auto;">
+      <div class="tc"><div class="tn">📐</div><h4>1단계: 기본틀 설계</h4><p>화면에 격언을 담을 단정한 카드 디자인을 만듭니다.</p></div>
+      <div class="tc"><div class="tn">🔀</div><h4>2단계: 명언 셔플</h4><p>다양한 준비 명언 데이터를 연동해 랜덤 노출을 끕니다.</p></div>
+      <div class="tc good"><div class="tn">🎨</div><h4>3단계: 디자인 개선</h4><p>감각적인 그라데이션 및 부드러운 손글씨 폰트를 입힙니다.</p></div>
+      <div class="tc"><div class="tn">💾</div><h4>4단계: 이미지 파일 저장</h4><p>카드를 한 장의 PNG 파일로 즉시 다운로드해 보관합니다.</p></div>
+      <div class="tc blue-accent"><div class="tn">🖼️</div><h4>5단계: 내 사진 합성</h4><p>사용자 컴퓨터의 사진을 업로드해 카드 배경으로 조화롭게 합성합니다.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- 03. AI 시대의 개발 -->
+<section class="slide" data-title="03. 바이브 코딩이란">
+  <div class="inner">
+    <div class="pill">💡 시대의 변화</div>
+    <h2>말만 하면 만들어주는 바이브 코딩</h2>
+    <p class="sub">수백 개의 복잡한 코딩 규칙을 암기할 필요가 전혀 없습니다.</p>
+    <div class="three" style="max-width: 850px; margin: 32px auto 0;">
+      <div class="tc" style="border-color: rgba(244, 63, 94, 0.3); background: rgba(244, 63, 94, 0.04);">
+        <div class="tn" style="background: rgba(244, 63, 94, 0.15); border-color: rgba(244, 63, 94, 0.4); color: var(--rose);">📜</div>
+        <h4>예전의 개발 방식</h4>
+        <p style="font-size: 15px; margin-top: 10px;">
+          아이디어 구상<br>
+          ↓<br>
+          <b>프로그래밍 언어(HTML, CSS, JS) 직접 공부</b><br>
+          ↓<br>
+          오타 하나에 가동 정지 (좌절과 실패)
+        </p>
+      </div>
+      <div class="tc" style="grid-column: span 2; background: var(--panel);">
+        <div class="tn" style="background: rgba(99, 102, 241, 0.15); border-color: var(--line-accent); color: var(--primary-light);">🚀</div>
+        <h4>오늘의 바이브 코딩 (디지털 2~3단계 최적)</h4>
+        <p style="font-size: 15px; margin-top: 10px;">
+          아이디어 구상 💡<br>
+          ↓<br>
+          <b>AI 대화창(제미나이·ChatGPT·클로드)에 일상 한글로 요청 💬</b><br>
+          ↓<br>
+          <b>AI가 실시간 완성해준 코드를 복사해서 index.html에 저장 💻</b><br>
+          ↓<br>
+          나만의 카드 앱 즉각 로딩 및 사용 시작! 🚀
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 04. 바이브코딩 3대 원칙 -->
+<section class="slide" data-title="04. 바이브코딩 3대원칙">
+  <div class="inner">
+    <div class="pill">🔑 성공 핵심</div>
+    <h2>AI와 협업하는 바이브코딩 3대 원칙</h2>
+    <p class="sub">이 3가지만 기억하면 코딩 지식이 전혀 없어도 실패 없이 앱을 완성합니다.</p>
+    <div class="three" style="max-width: 850px; margin: 28px auto 0;">
+      <div class="tc">
+        <div class="tn">💬</div>
+        <h4>명확하게 대화하기</h4>
+        <p>AI에게 '앱 만들어줘' 대신, 어떤 모양인지, 어떤 색상인지 구체적인 눈높이 상황을 설명해 줍니다.</p>
+      </div>
+      <div class="tc">
+        <div class="tn">🧱</div>
+        <h4>하나씩 쪼개서 지시하기</h4>
+        <p>처음부터 모든 기능을 다 만들라고 하지 말고, 뼈대 ➔ 버튼 ➔ 색상 ➔ 저장 순으로 한 단계씩 요청합니다.</p>
+      </div>
+      <div class="tc good">
+        <div class="tn">⚡</div>
+        <h4>에러 메시지 복사해서 넘기기</h4>
+        <p>화면이 안 뜨거나 오류가 나면 당황하지 말고 화면의 에러 글씨나 이상 증상을 그대로 복사해 AI에 물어봅니다.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 05. 진행 방식 -->
+<section class="slide" data-title="05. 실습 진행 단계">
+  <div class="inner">
+    <div class="pill">🔄 반복 프로세스</div>
+    <h2>오늘의 실습 진행 단계 (4단계의 반복)</h2>
+    <p class="sub">각 실습 라운드는 아래의 체계적인 흐름을 따라 작동하며 강사가 개별 타이머를 설정해 드립니다.</p>
+    <div class="three">
+      <div class="tc"><div class="tn">💬</div><h4>요청 정리</h4><p>이번 라운드에 추가해야 할 명확한 목표를 한국어로 간단히 정의합니다.</p></div>
+      <div class="tc"><div class="tn">📋</div><h4>AI에게 전송</h4><p>장표에 제공된 예시 마스터 프롬프트를 클립보드에 복사해 AI 대화창에 입력합니다.</p></div>
+      <div class="tc good"><div class="tn">⚡</div><h4>피드백 & 수정</h4><p>브라우저로 즉시 결과물을 확인하고 에러 발생 시 대화창에 로그를 복사해 수정 요청합니다.</p></div>
+    </div>
+    <div class="fact" style="margin-top: 28px;">
+      <div class="f"><b>👨‍🏫 강사 조언</b> <span>— 설정된 시간 내에 완료하지 못해도 낙심할 필요 없습니다. 다음 세션에서도 코드를 이어서 점진적으로 보강할 수 있습니다.</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- 06. [실습 1] 카드 틀 만들기 -->
+<section class="slide" data-title="06. [실습1] 카드틀">
+  <div class="inner">
+    <div class="pill">🧱 [실습 1] 카드 틀 만들기</div>
+    <div class="pb-3">
+      <h2 style="text-align: left;">화면 가운데에 카드 영역 배치하기</h2>
+    </div>
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 my-auto items-stretch text-left">
+      <div class="lg:col-span-8 flex flex-col justify-between">
+        <div class="doc selected" style="margin: 0; max-width: 100%;">
+          <div class="dtag">Prompt 1 (페르소나 지정 포함)</div>
+          <div class="doc-btn-group">
+            <button class="zoom-btn" onclick="openPromptModal('prompt-1', 'easy-prompt-1')">🔍 확대</button>
+            <button class="copy-btn" onclick="copyPrompt('prompt-1', this)">📋 복사</button>
+          </div>
+          <h4>개발자 페르소나 설정 및 카드 뼈대 요청하기</h4>
+          <pre id="prompt-1">"너는 초보자도 쉽게 이해할 수 있도록 친절하고 세심하게 반응형 웹앱을 만드는 최고 전문 웹 프론트엔드 개발자이자 바이브코딩 튜터야. html, css, js를 단 하나의 파일(index.html)에 담아서 깔끔한 웹페이지를 만들어줘. 화면 가운데에 가로 350px, 세로 450px 크기의 부드러운 둥근 모서리 카드를 배치해주고 카드 내부 배경은 편안한 베이지 색상으로 채워줘. 카드 중앙에는 '오늘의 명언이 여기에 들어갑니다'라는 예시 텍스트를 크게 넣어줘."</pre>
+        </div>
+
+        <!-- 💡 왕초보 눈높이 쉬운 말 지시 팁 -->
+        <div class="easy-prompt-card" id="easy-prompt-1">
+          <b>🗣️ 왕초보 말로 쉽게 지시하기:</b><br>
+          <span>"너는 친절한 내 전담 개발 튜터야! 화면 가운데에 예쁜 둥근 명언 상자 하나 만들어주고, 상자 안에 '오늘의 명언' 글씨를 크게 넣어줘!"</span>
+        </div>
+
+        <!-- 미니멀 타이머 박스 UI -->
+        <div class="timer-widget large" data-minutes="15">
+          <div class="digital-clock-box">
+            <span style="font-size: 18px;">⏱️</span>
+            <div class="timer-time">15:00</div>
+          </div>
+          <div class="flex items-center gap-3">
+            <span style="color:var(--muted);" class="font-bold text-xs uppercase tracking-wider hidden md:inline">실습시간</span>
+            <div class="timer-btns"><button class="tbtn start">시작</button><button class="tbtn reset">초기화</button></div>
+          </div>
+        </div>
+      </div>
+      <div class="lg:col-span-4 interactive-card rounded-xl p-5 flex flex-col justify-between" style="background: var(--panel);">
+        <div>
+          <h4 class="font-extrabold text-lg mb-3" style="color:var(--txt);">✅ 확인할 사항</h4>
+          <ul class="space-y-3 text-sm font-semibold" style="color:var(--muted);">
+            <li class="flex items-start gap-2"><span>✅</span> <span>생성된 코드를 `index.html`로 저장하고 브라우저로 실행합니다.</span></li>
+            <li class="flex items-start gap-2"><span>✅</span> <span>모서리 둥글기나 카드가 화면 정중앙에 정렬되었는지 파악합니다.</span></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 07. [실습 2] 랜덤 명언 연동 -->
+<section class="slide" data-title="07. [실습2] 랜덤명언">
+  <div class="inner">
+    <div class="pill">🔀 [실습 2] 랜덤 명언 연동</div>
+    <div class="pb-3">
+      <h2 style="text-align: left;">배열 데이터 연동 및 변경 버튼 달기</h2>
+    </div>
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 my-auto items-stretch text-left">
+      <div class="lg:col-span-8 flex flex-col justify-between">
+        <div class="doc selected" style="margin: 0; max-width: 100%;">
+          <div class="dtag">Prompt 2</div>
+          <div class="doc-btn-group">
+            <button class="zoom-btn" onclick="openPromptModal('prompt-2', 'easy-prompt-2')">🔍 확대</button>
+            <button class="copy-btn" onclick="copyPrompt('prompt-2', this)">📋 복사</button>
+          </div>
+          <h4>명언 데이터베이스 및 동적 교체 로직</h4>
+          <pre id="prompt-2">"우리 한글 명언 5개와 그 말을 한 사람의 이름을 담은 자바스크립트 데이터 배열을 만들어줘. 그리고 카드 바로 아래에 '다른 명언 보기' 버튼을 하나 추가해줘. 버튼을 누를 때마다 배열 안의 명언 중 무작위로 하나가 선택되어 카드의 글씨로 바뀌게 구현해줘."</pre>
+        </div>
+
+        <!-- 💡 왕초보 눈높이 쉬운 말 지시 팁 -->
+        <div class="easy-prompt-card" id="easy-prompt-2">
+          <b>🗣️ 왕초보 말로 쉽게 지시하기:</b><br>
+          <span>"AI로 종흔 명언 10개 준비해 두고, 상자 밑에 '다른 명언 보기' 버튼 누를 때마다 글씨가 무작위로 짠하고 바뀌게 해줘!"</span>
+        </div>
+
+        <!-- 미니멀 타이머 박스 UI -->
+        <div class="timer-widget large" data-minutes="15">
+          <div class="digital-clock-box">
+            <span style="font-size: 18px;">⏱️</span>
+            <div class="timer-time">15:00</div>
+          </div>
+          <div class="flex items-center gap-3">
+            <span style="color:var(--muted);" class="font-bold text-xs uppercase tracking-wider hidden md:inline">실습시간</span>
+            <div class="timer-btns"><button class="tbtn start">시작</button><button class="tbtn reset">초기화</button></div>
+          </div>
+        </div>
+      </div>
+      <div class="lg:col-span-4 interactive-card rounded-xl p-5 flex flex-col justify-between" style="background: var(--panel);">
+        <div>
+          <h4 class="font-extrabold text-lg mb-3" style="color:var(--txt);">✅ 확인할 사항</h4>
+          <ul class="space-y-3 text-sm font-semibold" style="color:var(--muted);">
+            <li class="flex items-start gap-2"><span>✅</span> <span>새로운 '다른 명언 보기' 버튼이 생성되었는지 봅니다.</span></li>
+            <li class="flex items-start gap-2"><span>✅</span> <span>클릭할 때마다 카드의 글자가 무작위로 변형되는지 테스트합니다.</span></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 08. [실습 3] 디자인 꾸미기 -->
+<section class="slide" data-title="08. [실습3] 디자인꾸미기">
+  <div class="inner">
+    <div class="pill">🎨 [실습 3] 디자인 꾸미기</div>
+    <div class="pb-3">
+      <h2 style="text-align: left;">테마 분위기 및 글꼴 개선하기</h2>
+    </div>
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 my-auto items-stretch text-left">
+      <div class="lg:col-span-8 flex flex-col justify-between">
+        <div class="doc selected" style="margin: 0; max-width: 100%;">
+          <div class="dtag">Prompt 3</div>
+          <div class="doc-btn-group">
+            <button class="zoom-btn" onclick="openPromptModal('prompt-3', 'easy-prompt-3')">🔍 확대</button>
+            <button class="copy-btn" onclick="copyPrompt('prompt-3', this)">📋 복사</button>
+          </div>
+          <h4>그라데이션 및 폰트 변경 스타일 지정</h4>
+          <pre id="prompt-3">"웹페이지 카드 디자인을 세련되게 업그레이드하고 싶어. 카드에 어울리는 구글 웹폰트(예: 감성적인 나눔명조 또는 나눔손글씨 붓 폰트)를 헤더에 연결하고 명언 텍스트에 적용해줘. 카드 모서리에 입체감을 주는 은은한 그림자(Shadow) 효과와 배경 그라데이션을 적용해줘."</pre>
+        </div>
+
+        <!-- 💡 왕초보 눈높이 쉬운 말 지시 팁 -->
+        <div class="easy-prompt-card" id="easy-prompt-3">
+          <b>🗣️ 왕초보 말로 쉽게 지시하기:</b><br>
+          <span>"글씨체를 예쁜 명조체나 붓글씨로 바꿔주고, 상자 뒤에 은은한 그림자랑 예쁜 그라데이션 색상을 넣어줘!"</span>
+        </div>
+
+        <!-- 미니멀 타이머 박스 UI -->
+        <div class="timer-widget large" data-minutes="15">
+          <div class="digital-clock-box">
+            <span style="font-size: 18px;">⏱️</span>
+            <div class="timer-time">15:00</div>
+          </div>
+          <div class="flex items-center gap-3">
+            <span style="color:var(--muted);" class="font-bold text-xs uppercase tracking-wider hidden md:inline">실습시간</span>
+            <div class="timer-btns"><button class="tbtn start">시작</button><button class="tbtn reset">초기화</button></div>
+          </div>
+        </div>
+      </div>
+      <div class="lg:col-span-4 interactive-card rounded-xl p-5 flex flex-col justify-between" style="background: var(--panel);">
+        <div>
+          <h4 class="font-extrabold text-lg mb-3" style="color:var(--txt);">✅ 확인할 사항</h4>
+          <ul class="space-y-3 text-sm font-semibold" style="color:var(--muted);">
+            <li class="flex items-start gap-2"><span>✅</span> <span>글씨체가 고딕체에서 감성적인 명조나 붓글씨 느낌으로 바뀌었는지 봅니다.</span></li>
+            <li class="flex items-start gap-2"><span>✅</span> <span>그림자가 적용되어 입체적인 은은함이 우러나는지 확인합니다.</span></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 09. [실습 4] 이미지 저장 기능 -->
+<section class="slide" data-title="09. [실습4] 이미지저장">
+  <div class="inner">
+    <div class="pill">💾 [실습 4] 이미지 저장 기능</div>
+    <div class="pb-3">
+      <h2 style="text-align: left;">카드를 온전한 PNG 파일로 다운로드하기</h2>
+    </div>
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 my-auto items-stretch text-left">
+      <div class="lg:col-span-8 flex flex-col justify-between">
+        <div class="doc selected" style="margin: 0; max-width: 100%;">
+          <div class="dtag">Prompt 4</div>
+          <div class="doc-btn-group">
+            <button class="zoom-btn" onclick="openPromptModal('prompt-4', 'easy-prompt-4')">🔍 확대</button>
+            <button class="copy-btn" onclick="copyPrompt('prompt-4', this)">📋 복사</button>
+          </div>
+          <h4>Canvas 드로잉 연동 및 이미지 다운로드 작성</h4>
+          <pre id="prompt-4">"카드 영역 아래에 '이미지 저장' 버튼을 추가해줘. 버튼을 클릭하면 카드 내부의 배경 그라데이션과 텍스트(명언과 작가명)를 자바스크립트의 HTML5 Canvas API를 사용해 하나로 그리고, wise-quote-card.png 라는 이름의 고화질 이미지 파일로 로컬 다운로드하는 저장 기능 함수를 연동해줘."</pre>
+        </div>
+
+        <!-- 💡 왕초보 눈높이 쉬운 말 지시 팁 -->
+        <div class="easy-prompt-card" id="easy-prompt-4">
+          <b>🗣️ 왕초보 말로 쉽게 지시하기:</b><br>
+          <span>"'사진으로 저장' 버튼 하나 만들어서, 클릭하면 지금 보이는 이 명언 상자를 그대로 그림 파일로 내 폰에 저장해 줘!"</span>
+        </div>
+
+        <!-- 미니멀 타이머 박스 UI -->
+        <div class="timer-widget large" data-minutes="15">
+          <div class="digital-clock-box">
+            <span style="font-size: 18px;">⏱️</span>
+            <div class="timer-time">15:00</div>
+          </div>
+          <div class="flex items-center gap-3">
+            <span style="color:var(--muted);" class="font-bold text-xs uppercase tracking-wider hidden md:inline">실습시간</span>
+            <div class="timer-btns"><button class="tbtn start">시작</button><button class="tbtn reset">초기화</button></div>
+          </div>
+        </div>
+      </div>
+      <div class="lg:col-span-4 interactive-card rounded-xl p-5 flex flex-col justify-between" style="background: var(--panel);">
+        <div>
+          <h4 class="font-extrabold text-lg mb-3" style="color:var(--txt);">✅ 확인할 사항</h4>
+          <ul class="space-y-3 text-sm font-semibold" style="color:var(--muted);">
+            <li class="flex items-start gap-2"><span>✅</span> <span>이미지 저장 버튼이 추가되었는지 봅니다.</span></li>
+            <li class="flex items-start gap-2"><span>✅</span> <span>버튼 클릭 시 실제로 스마트폰/PC 다운로드 폴더로 내려받아지는지 체크합니다.</span></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 10. [실습 5] 내가 만든 배경 사진 넣기 -->
+<section class="slide" data-title="10. [실습5] 내사진배경">
+  <div class="inner">
+    <div class="pill">🏞️ [실습 5] 배경 이미지 업로드 메뉴 추가</div>
+    <div class="pb-3">
+      <h2 style="text-align: left;">나의 컴퓨터 사진을 배경으로 합성하기</h2>
+    </div>
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 my-auto items-stretch text-left">
+      <div class="lg:col-span-8 flex flex-col justify-between">
+        <div class="doc selected" style="margin: 0; max-width: 100%;">
+          <div class="dtag">Prompt 5</div>
+          <div class="doc-btn-group">
+            <button class="zoom-btn" onclick="openPromptModal('prompt-5', 'easy-prompt-5')">🔍 확대</button>
+            <button class="copy-btn" onclick="copyPrompt('prompt-5', this)">📋 복사</button>
+          </div>
+          <h4>배경 이미지 업로드 및 합성 옵션 처리</h4>
+          <pre id="prompt-5">"카드 아래에 '배경 이미지 업로드'를 위한 파일 선택(&lt;input type='file'&gt;) 버튼을 추가해줘. 사용자가 로컬 이미지 파일을 선택해 로드하면 카드의 배경으로 적용되게 자바스크립트 FileReader를 연동해줘. 또한 이미지 위에 텍스트가 묻히지 않도록 반투명한 검은색 막(rgba(0,0,0,0.45))을 한 겹 씌워주고, 저장 버튼을 누를 때에도 업로드한 사진과 명언 텍스트가 정확한 캔버스 상에 합성되어 다운로드되도록 기존 자바스크립트를 수정해줘."</pre>
+        </div>
+
+        <!-- 💡 왕초보 눈높이 쉬운 말 지시 팁 -->
+        <div class="easy-prompt-card" id="easy-prompt-5">
+          <b>🗣️ 왕초보 말로 쉽게 지시하기:</b><br>
+          <span>"'내 사진 올리기' 버튼 만들어서 내 앨범 사진을 명언 상자 뒤에 얹어주고, 글씨가 잘 보이게 배경을 살짝 어둡게 해줘!"</span>
+        </div>
+
+        <!-- 미니멀 타이머 박스 UI -->
+        <div class="timer-widget large" data-minutes="15">
+          <div class="digital-clock-box">
+            <span style="font-size: 18px;">⏱️</span>
+            <div class="timer-time">15:00</div>
+          </div>
+          <div class="flex items-center gap-3">
+            <span style="color:var(--muted);" class="font-bold text-xs uppercase tracking-wider hidden md:inline">실습시간</span>
+            <div class="timer-btns"><button class="tbtn start">시작</button><button class="tbtn reset">초기화</button></div>
+          </div>
+        </div>
+      </div>
+      <div class="lg:col-span-4 interactive-card rounded-xl p-5 flex flex-col justify-between" style="background: var(--panel);">
+        <div>
+          <h4 class="font-extrabold text-lg mb-3" style="color:var(--txt);">✅ 확인할 사항</h4>
+          <ul class="space-y-3 text-sm font-semibold" style="color:var(--muted);">
+            <li class="flex items-start gap-2"><span>✅</span> <span>직접 고른 내 사진 배경이 카드로 채워지는지 봅니다.</span></li>
+            <li class="flex items-start gap-2"><span>✅</span> <span>저장된 PNG에 내가 올린 사진이 제대로 합성되어 나오는지 체크합니다.</span></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 11. AI 대화창 200% 활용 꿀팁 -->
+<section class="slide" data-title="11. 대화창 활용꿀팁">
+  <div class="inner">
+    <div class="pill">💡 협업 꿀팁</div>
+    <h2>AI 대화창(제미나이·ChatGPT·클로드) 200% 활용법</h2>
+    <p class="sub">AI는 문장의 맥락과 비유를 정확히 알아듣습니다. 일상의 대화처럼 상세히 요청해 보세요.</p>
+    <div class="three">
+      <div class="tc"><div class="tn">🔍</div><h4>글씨 및 간격 세밀 조절</h4><p class="sub-text" style="color:var(--accent); font-weight:700; margin-top:8px;">"명언 텍스트가 더 웅장하게 보이도록 글자 크기를 24px로 키워주고, 줄 간격을 1.6배로 시원하게 배치해줘."</p></div>
+      <div class="tc"><div class="tn">✨</div><h4>디자인 완성도 상향</h4><p class="sub-text" style="color:var(--accent); font-weight:700; margin-top:8px;">"ShadCN UI처럼 보더 라인을 1px 두께의 회색 단색선으로 심플하게 바꾸고, 마우스를 올릴 때 2px 위로 스르륵 솟게 해줘."</p></div>
+      <div class="tc good"><div class="tn">💬</div><h4>오류 대화 디버깅</h4><p class="sub-text" style="color:var(--primary-light); font-weight:700; margin-top:8px;">"사진을 올렸더니 글씨가 뒤로 묻혀서 안 보여. 반투명 검은색 막을 글씨 바로 아래 레이어로 한 겹 넣어줘."</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- 12. 좋은 프롬프트 vs 나쁜 프롬프트 -->
+<section class="slide" data-title="12. 프롬프트 비교">
+  <div class="inner">
+    <div class="pill">⚖️ 프롬프트 비교</div>
+    <h2>결과물의 차이를 만드는 프롬프트 작성법</h2>
+    <p class="sub">AI에게 입력하는 문장의 구체성이 높을수록 원하는 앱이 한 번에 완성됩니다.</p>
+
+    <!-- 12페이지: 마우스 롤오버 호버 시에만 하이라이트 되도록 기본 미선택 평평 상태로 스타일 수정 -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-y-12 md:gap-x-12 max-w-5xl mx-auto mt-8 text-left" style="transform: translateY(6px);">
+      <!-- ❌ 피해야 할 요청 박스 (기본 미선택, 호버 시 레드 테두리 팝업) -->
+      <div class="tc prompt-bad-box" style="background:var(--panel); padding: 32px 28px; box-shadow: 0 10px 30px rgba(0,0,0,0.4);">
+        <div class="flex items-center gap-2 mb-4">
+          <span class="font-extrabold text-base" style="color:var(--rose);">❌ 피해야 할 요청</span>
+        </div>
+        <h4 class="text-lg font-extrabold mb-3" style="color:var(--txt);">"명언 앱 아무렇게나 하나 만들어줘."</h4>
+        <p class="text-sm leading-relaxed" style="color:var(--muted);">
+          • 너무 모호하여 AI가 원치 않는 색상과 기능을 멋대로 생성함<br>
+          • 어떤 명언을 넣을지 몰라 엉뚱한 영어 예시 텍스트가 들어감<br>
+          • 결과물을 받은 후 여러 번 처음부터 수정해야 함
+        </p>
+      </div>
+
+      <!-- ✅ 권장하는 올바른 요청 박스 (기본 미선택, 호버 시 인디고 테두리 팝업) -->
+      <div class="tc prompt-good-box" style="background:var(--panel); padding: 32px 28px; box-shadow: 0 10px 30px rgba(0,0,0,0.4); margin-top: 6px;">
+        <div class="flex items-center gap-2 mb-4">
+          <span class="font-extrabold text-base" style="color:var(--primary-light);">✅ 권장하는 올바른 요청</span>
+        </div>
+        <h4 class="text-lg font-extrabold mb-3" style="color:var(--txt);">"가운데 350x450px 크기 카드를 만들고 한글 명언 5개 셔플 버튼을 달아줘."</h4>
+        <p class="text-sm leading-relaxed" style="color:var(--muted);">
+          • 크기, 위치, 데이터, 동작(버튼)이 명확하여 한 번에 원하는 앱 생성<br>
+          • 에러 발생률이 낮고 코드가 깔끔하게 정돈됨<br>
+          • 시간 단축 및 완성도 대폭 향상
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 13. 나만의 홈 프로젝트 응용 -->
+<section class="slide" data-title="13. 나만의 첫 응용앱">
+  <div class="inner">
+    <div class="pill">🏠 응용 아이디어</div>
+    <h2>오늘 배운 카드로 집에 가서 만들어 볼 수 있는 나만의 첫 앱</h2>
+    <p class="sub">오늘의 카드 빌드 구조 하나만 익히면 아래 주제들을 전부 스스로 만들어 낼 수 있습니다.</p>
+    <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 18px; max-width: 900px; margin: 28px auto 0; text-align: left;">
+      <div class="tc"><div class="tn">①</div><h4>우리 가족 힐링 명언</h4><p>가족 단톡방에 매일 건강과 안부를 전하는 다정다감 안부 명언 카드 제작 앱.</p></div>
+      <div class="tc"><div class="tn">②</div><h4>매일 아침 은혜말씀 카드</h4><p>하루를 시작할 때 묵상하기 좋은 신앙 구절을 무작위로 호출하고 화면에 담는 말씀 카드 앱.</p></div>
+      <div class="tc blue-accent"><div class="tn">③</div><h4>하루 감사 실천 일기</h4><p>오늘 있었던 고마운 순간의 글과 사진을 합성해 나만의 감사 카드로 소장하는 감정 케어 앱.</p></div>
+      <div class="tc good"><div class="tn">④</div><h4>매일 1분 필수 영어 회화</h4><p>일상 생활이나 해외여행 시 유용한 영어 문장과 해석을 감성 카드로 출력해 소장하는 습관 앱.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- 14. 마무리 정리 -->
+<section class="slide" data-title="14. 학습 성과 마무리">
+  <div class="inner">
+    <div class="pill">📑 오늘 학습 아웃라인</div>
+    <h2>오늘 배운 바이브코딩 핵심 성과 정리</h2>
+    <div class="three" style="margin-top: 32px;">
+      <div class="tc" style="grid-column: span 2;">
+        <h4 class="font-extrabold text-lg mb-2" style="color:var(--primary-light);">🎉 단계적 개발로 성취한 웹앱</h4>
+        <ul class="space-y-3 text-sm font-semibold" style="list-style:none; padding: 0; color:var(--muted);">
+          <li class="flex items-center gap-2"><span>✅</span> <span>1단계: 화면 가운데에 모바일 최적화 배치 설계 완료</span></li>
+          <li class="flex items-center gap-2"><span>✅</span> <span>2단계: 배열 데이터 연동을 통해 동적으로 명언 교체 셔플 버튼 연동</span></li>
+          <li class="flex items-center gap-2"><span>✅</span> <span>3~4단계: 그림자 테두리 및 폰트 변경, 이미지 저장 Canvas 모듈 구현</span></li>
+          <li class="flex items-center gap-2"><span>✅</span> <span>5단계: 내 사진을 배경 파일로 합성하고 다운로드 처리 완료</span></li>
+        </ul>
+      </div>
+      <div class="tc">
+        <h4 class="font-extrabold text-lg mb-2" style="color:var(--accent);">🚀 향후 확장점</h4>
+        <p class="text-sm leading-relaxed" style="margin-top:10px; color:var(--muted);">이번 기본 카드를 다듬는 노하우로 다음 단계의 <b>감사 일기, 은혜로운 성경 말씀, 영어회화 카드 발송기</b> 등 유사한 모든 텍스트 카드 앱을 무제한으로 확장 코딩할 수 있게 됩니다.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 15. 수고하셨습니다 -->
+<section class="slide" style="border-bottom:none" data-title="15. 수고하셨습니다">
+  <div class="inner">
+    <div class="chapter">수고하셨습니다 👏</div>
+    <h2 style="font-size: clamp(32px, 5.5vw, 60px); font-weight: 900; margin: 0 0 16px; letter-spacing: -1.5px;">나만의 첫 번째 앱 완료!</h2>
+    <p class="sub animate-entry delay-100">배우고 때로 익히면 또한 기쁘지 아니한가 — 오늘 그 첫걸음을 떼셨습니다.<br>나만의 명언 카드로 매일 새로운 동기부여를 만들어 보세요.</p>
+    
+    <!-- 15페이지: 요구사항 반영 (대형 굵은 오렌지 타이틀 및 숏폼 영상 만들기 특강 내용 연동) -->
+    <div class="max-w-2xl mx-auto next-class-box animate-entry delay-200 mt-8">
+      <h3 class="next-class-title">
+        <span>📢</span>
+        <span>다음 특강 안내: AI 숏폼 영상 만들기</span>
+      </h3>
+      <p class="text-base md:text-lg leading-relaxed font-medium" style="color:var(--txt); margin: 0 auto; max-width: 620px; padding-bottom: 6px;">
+        AI를 활용해 단 몇 분 만에 대본 작성부터 영상 합성, 자동 자막 생성까지 완성하는 <b style="color:var(--orange-bright); font-weight:800;">'AI 숏폼 영상 만들기'</b> 특강이 조만간 진행될 예정입니다. 나만의 매력적인 숏폼 콘텐츠 제작 노하우로 다음 특강에서 다시 뵙겠습니다!
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- 프롬프트 대형 확대 모달 팝업 UI -->
+<div id="prompt-modal">
+  <div class="modal-box">
+    <h3>
+      <span>🔍 실습 프롬프트 확대보기</span>
+      <button class="modal-close-btn" onclick="closePromptModal()">❌ 닫기 (ESC)</button>
+    </h3>
+    <div style="font-size:14px; color:var(--muted); margin-bottom:10px;">[원본 기술 마스터 프롬프트]</div>
+    <pre id="modal-prompt-text"></pre>
+    <div id="modal-easy-prompt-box" class="easy-prompt-card" style="margin-top:16px; font-size:16px; padding:18px;">
+    </div>
+  </div>
+</div>
+
+<!-- 알림 토스트 팝업 -->
+<div id="toast-message">
+  <span>✅</span>
+  <span>클립보드에 프롬프트가 복사되었습니다! 이제 AI에게 붙여넣으세요! 🎉</span>
+</div>
+
+<script>
+/* ================= Remotion 몽환적 오로라 백그라운드 (알파 농도 +0.1 보정 연동) ================= */
+(function initRemotionGradient() {
+  const canvas = document.getElementById('remotion-canvas');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  let width, height;
+  let t = 0;
+
+  function resize() {
+    width = canvas.width = window.innerWidth;
+    height = canvas.height = window.innerHeight;
+  }
+  window.addEventListener('resize', resize);
+  resize();
+
+  const blobs = [
+    { x: 0.20, y: 0.25, r: 0.65, color: 'rgba(99, 102, 241, 0.38)', vx: 0.0015, vy: 0.0018 },
+    { x: 0.80, y: 0.20, r: 0.70, color: 'rgba(56, 189, 248, 0.32)', vx: -0.0018, vy: 0.0012 },
+    { x: 0.50, y: 0.78, r: 0.60, color: 'rgba(129, 140, 248, 0.30)', vx: 0.0012, vy: -0.0015 },
+    { x: 0.30, y: 0.65, r: 0.55, color: 'rgba(244, 63, 94, 0.28)', vx: -0.0020, vy: -0.0010 }
+  ];
+
+  function render() {
+    t += 0.018;
+    ctx.clearRect(0, 0, width, height);
+
+    blobs.forEach((b, i) => {
+      const cx = (b.x + Math.sin(t * 0.8 + i * 1.5) * 0.20) * width;
+      const cy = (b.y + Math.cos(t * 0.6 + i * 1.5) * 0.20) * height;
+      const radius = b.r * Math.min(width, height) * (1 + Math.sin(t * 0.5 + i) * 0.18);
+
+      const grad = ctx.createRadialGradient(cx, cy, 0, cx, cy, radius);
+      grad.addColorStop(0, b.color);
+      grad.addColorStop(0.7, b.color.replace(/[\d\.]+\)$/, '0.12)'));
+      grad.addColorStop(1, 'rgba(9, 13, 22, 0)');
+
+      ctx.fillStyle = grad;
+      ctx.beginPath();
+      ctx.arc(cx, cy, radius, 0, Math.PI * 2);
+      ctx.fill();
+    });
+
+    requestAnimationFrame(render);
+  }
+  render();
+})();
+
+/* ================= 슬라이드 & UI 제어 스크립트 ================= */
+(function(){
+  var slides = Array.prototype.slice.call(document.querySelectorAll('.slide'));
+  var dotsContainer = document.getElementById('dots');
+  var slideSelectNav = document.getElementById('slide-select-nav');
+  var totalSlides = slides.length;
+  
+  slides.forEach(function(slide, index) {
+    var slideNum = index + 1;
+    slide.id = 'slide-' + slideNum;
+    var title = slide.getAttribute('data-title') || ('슬라이드 ' + slideNum);
+    
+    var dot = document.createElement('a');
+    dot.href = '#';
+    dot.setAttribute('data-title', title);
+    dot.addEventListener('click', function(e) {
+      e.preventDefault();
+      goToSlide(slideNum);
+    });
+    dotsContainer.appendChild(dot);
+  });
+  
+  var dotElements = Array.prototype.slice.call(dotsContainer.children);
+  var currentSlide = 1;
+  var previousSlide = null;
+
+  function goToSlide(n) {
+    if (n < 1) n = 1;
+    if (n > totalSlides) n = totalSlides;
+    previousSlide = currentSlide;
+    currentSlide = n;
+    updateSlide();
+  }
+  window.goToSlide = goToSlide;
+
+  function updateSlide() {
+    var direction = (previousSlide === null) ? null : (currentSlide > previousSlide ? 'dir-next' : 'dir-prev');
+    
+    slides.forEach(function(slide, idx) {
+      var slideNum = idx + 1;
+      slide.classList.remove('dir-next', 'dir-prev');
+      
+      if (slideNum === currentSlide) {
+        slide.classList.add('in', 'active');
+        if (direction) {
+          slide.style.animation = 'none';
+          void slide.offsetHeight;
+          slide.style.animation = ''; 
+          slide.classList.add(direction);
+        }
+        slide.querySelectorAll('.animate-entry').forEach(function(inner) {
+          inner.style.animation = 'none';
+          void inner.offsetHeight;
+          inner.style.animation = '';
+        });
+      } else {
+        slide.classList.remove('active');
+      }
+    });
+
+    dotElements.forEach(function(dot, idx) {
+      dot.classList.toggle('on', idx === (currentSlide - 1));
+    });
+
+    if (slideSelectNav) {
+      slideSelectNav.value = currentSlide.toString();
+    }
+
+    var progressBar = document.getElementById('pbar');
+    if (progressBar) {
+      progressBar.style.width = (currentSlide / totalSlides * 100) + '%';
+    }
+
+    if (slides[currentSlide - 1]) {
+      slides[currentSlide - 1].scrollIntoView({ behavior: 'smooth' });
+    }
+  }
+
+  function nextSlide() {
+    if (currentSlide < totalSlides) {
+      previousSlide = currentSlide;
+      currentSlide++;
+      updateSlide();
+    }
+  }
+  window.nextSlide = nextSlide;
+
+  function prevSlide() {
+    if (currentSlide > 1) {
+      previousSlide = currentSlide;
+      currentSlide--;
+      updateSlide();
+    }
+  }
+  window.prevSlide = prevSlide;
+
+  window.addEventListener('keydown', function(e) {
+    var tag = document.activeElement ? document.activeElement.tagName : '';
+    if (['INPUT','TEXTAREA','BUTTON','A','SELECT'].includes(tag)) return;
+    
+    if (e.key === 'Escape') {
+      closePromptModal();
+    }
+    if (e.key === 'ArrowDown' || e.key === 'PageDown' || e.key === 'ArrowRight' || e.key === ' ') {
+      e.preventDefault();
+      nextSlide();
+    }
+    if (e.key === 'ArrowUp' || e.key === 'PageUp' || e.key === 'ArrowLeft') {
+      e.preventDefault();
+      prevSlide();
+    }
+  });
+
+  if ('IntersectionObserver' in window) {
+    var observer = new IntersectionObserver(function(entries) {
+      entries.forEach(function(entry) {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('in');
+          var currentIndex = slides.indexOf(entry.target);
+          currentSlide = currentIndex + 1; 
+          
+          dotElements.forEach(function(dot, j) {
+            dot.classList.toggle('on', j === currentIndex);
+          });
+          
+          if (slideSelectNav) {
+            slideSelectNav.value = currentSlide.toString();
+          }
+
+          var progressBar = document.getElementById('pbar');
+          if (progressBar) {
+            progressBar.style.width = (currentSlide / totalSlides * 100) + '%';
+          }
+        }
+      });
+    }, { threshold: 0.5, rootMargin: '0px 0px -5% 0px' });
+    
+    slides.forEach(function(slide) {
+      observer.observe(slide);
+    });
+  } else {
+    slides.forEach(function(slide) {
+      slide.classList.add('in');
+    });
+  }
+
+  window.addEventListener('scroll', function() {
+    var scrollTop = window.scrollY;
+    var scrollHint = document.querySelector('.hint');
+    if (scrollHint) {
+      scrollHint.style.opacity = scrollTop > 200 ? '0' : '1';
+    }
+  }, { passive: true });
+
+  updateSlide();
+})();
+
+/* ================= 뷰어 컨트롤 기능 (전체화면, 테마, 모바일뷰) ================= */
+const btnFullscreen = document.getElementById('btn-fullscreen');
+btnFullscreen.addEventListener('click', function() {
+  if (!document.fullscreenElement) {
+    document.documentElement.requestFullscreen().then(() => {
+      btnFullscreen.innerHTML = '🖥️ <span>해제</span>';
+      btnFullscreen.classList.add('active');
+    }).catch(err => console.log(err));
+  } else {
+    if (document.exitFullscreen) {
+      document.exitFullscreen().then(() => {
+        btnFullscreen.innerHTML = '🖥️ <span>전체화면</span>';
+        btnFullscreen.classList.remove('active');
+      });
+    }
+  }
+});
+
+const btnTheme = document.getElementById('btn-theme');
+btnTheme.addEventListener('click', function() {
+  document.body.classList.toggle('light-mode');
+  const isLight = document.body.classList.contains('light-mode');
+  if (isLight) {
+    btnTheme.innerHTML = '☀️ <span>주간</span>';
+    btnTheme.classList.add('active');
+  } else {
+    btnTheme.innerHTML = '🌙 <span>야간</span>';
+    btnTheme.classList.remove('active');
+  }
+});
+
+const btnMobileView = document.getElementById('btn-mobile-view');
+btnMobileView.addEventListener('click', function() {
+  document.body.classList.toggle('mobile-view');
+  const isMobile = document.body.classList.contains('mobile-view');
+  if (isMobile) {
+    btnMobileView.innerHTML = '📱 <span>모바일ON</span>';
+    btnMobileView.classList.add('active');
+  } else {
+    btnMobileView.innerHTML = '📱 <span>모바일뷰</span>';
+    btnMobileView.classList.remove('active');
+  }
+});
+
+/* ================= 프롬프트 확대 모달 기능 ================= */
+function openPromptModal(promptId, easyPromptId) {
+  var text = document.getElementById(promptId).textContent;
+  document.getElementById('modal-prompt-text').textContent = text;
+  
+  if (easyPromptId && document.getElementById(easyPromptId)) {
+    document.getElementById('modal-easy-prompt-box').innerHTML = document.getElementById(easyPromptId).innerHTML;
+    document.getElementById('modal-easy-prompt-box').style.display = 'block';
+  } else {
+    document.getElementById('modal-easy-prompt-box').style.display = 'none';
+  }
+  
+  document.getElementById('prompt-modal').classList.add('show');
+}
+window.openPromptModal = openPromptModal;
+
+function closePromptModal() {
+  document.getElementById('prompt-modal').classList.remove('show');
+}
+window.closePromptModal = closePromptModal;
+
+// 프롬프트 복사 기능
+function copyPrompt(id, btn) {
+  var content = document.getElementById(id).textContent;
+  var toast = document.getElementById('toast-message');
+
+  function showSuccess() {
+    toast.classList.add('show');
+    if (btn) {
+      if (btn.dataset.originalHtml === undefined) btn.dataset.originalHtml = btn.innerHTML;
+      btn.innerHTML = '✅ 복사 완료!';
+    }
+    setTimeout(function() {
+      toast.classList.remove('show');
+      if (btn) {
+        btn.innerHTML = btn.dataset.originalHtml;
+      }
+    }, 2200);
+  }
+
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(content).then(showSuccess).catch(function() {
+      fallbackCopy(content, showSuccess);
+    });
+  } else {
+    fallbackCopy(content, showSuccess);
+  }
+}
+window.copyPrompt = copyPrompt;
+
+function fallbackCopy(text, cb) {
+  var textarea = document.createElement('textarea');
+  textarea.value = text;
+  textarea.style.position = 'fixed';
+  textarea.style.opacity = '0';
+  document.body.appendChild(textarea);
+  textarea.select();
+  try {
+    document.execCommand('copy');
+    cb();
+  } catch (err) {
+    console.error('클립보드 복사 에러:', err);
+  }
+  document.body.removeChild(textarea);
+}
+
+/* ================= 디지털 시계 타이머 제어 스크립트 ================= */
+document.querySelectorAll('.timer-widget').forEach(function(widget){
+  const totalSec = parseInt(widget.getAttribute('data-minutes'), 10) * 60;
+  let remaining = totalSec, timerId = null;
+  const timeEl = widget.querySelector('.timer-time');
+  const startBtn = widget.querySelector('.start');
+  const resetBtn = widget.querySelector('.reset');
+
+  function fmt(sec){ const m = Math.floor(sec/60), s = sec%60; return (m<10?'0':'')+m+':'+(s<10?'0':'')+s; }
+  function paint(){ timeEl.textContent = fmt(remaining); }
+  
+  function beep(){
+    try{
+      const ctx = new (window.AudioContext || window.webkitAudioContext)();
+      [0,1,2].forEach(function(i){
+        const o = ctx.createOscillator(), g = ctx.createGain();
+        o.connect(g); g.connect(ctx.destination);
+        o.frequency.value = 660; g.gain.value = 0.06;
+        o.start(ctx.currentTime + i*0.28); o.stop(ctx.currentTime + i*0.28 + 0.18);
+      });
+    }catch(e){}
+  }
+  
+  function tick(){
+    remaining--;
+    if (remaining <= 0){
+      remaining = 0; paint(); clearInterval(timerId); timerId = null;
+      startBtn.textContent = '완료'; startBtn.classList.add('!bg-rose-600'); beep(); return;
+    }
+    paint();
+  }
+  
+  startBtn.addEventListener('click', function(){
+    if (timerId){ clearInterval(timerId); timerId = null; startBtn.textContent = '계속'; return; }
+    if (remaining <= 0){ remaining = totalSec; startBtn.classList.remove('!bg-rose-600'); }
+    startBtn.textContent = '일시정지'; timerId = setInterval(tick, 1000);
+  });
+  
+  resetBtn.addEventListener('click', function(){
+    clearInterval(timerId); timerId = null; remaining = totalSec;
+    startBtn.textContent = '실습 시작'; startBtn.classList.remove('!bg-rose-600'); paint();
+  });
+  paint();
+});
+</script>
+</body>
+</html>
