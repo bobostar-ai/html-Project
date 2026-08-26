@@ -1,0 +1,2125 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>필요한 AI 무료강의 3탄 — AI로 만드는 포스터디자인 (누구나 가능) | Connect AI</title>
+<meta name="description" content="디자인 몰라도 OK! 말로 설명하는 나만의 포스터 디자인과 미리캔버스 최종 편집까지 완성하는 100분 실습 가이드안">
+<!-- Pretendard 고급 웹폰트 불러오기 -->
+<link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css" />
+<style>
+  /* 
+    ==========================================================================
+    🎨 차분하고 고급스러운 딥 로열 사파이어 & 은은한 네온 마젠타 포인트 시스템
+    ==========================================================================
+  */
+  :root { 
+    --bg: #060E1A; 
+    --panel: #0E1726; 
+    --panel-card: #172438; 
+    --panel-card-hover: #22334C;
+    --line: rgba(255, 255, 255, 0.09); 
+    --line-accent: rgba(59, 130, 246, 0.35);
+    --txt: #F8FAFC; 
+    --muted: #94A3B8; 
+    --dim: #64748B;
+    --primary: #3B82F6; 
+    --primary-light: #60A5FA;
+    --accent: #2DD4BF; 
+    
+    /* 🌸 제목 상단 뱃지 버튼 전용 은은한 네온 마젠타 색상 시스템 */
+    --magenta-txt: #FF53A5; 
+    --magenta-txt-light: #FF66B2;
+    --magenta-border: rgba(255, 42, 133, 0.35); 
+    --magenta-bg: rgba(255, 42, 133, 0.08); 
+    --magenta-glow: rgba(255, 42, 133, 0.18);
+
+    --rose: #F43F5E; 
+    --rose-bright: #FF2E55;
+    --orange: #F59E0B; 
+    --orange-bright: #FBBF24;
+    --gold: #FFD700;
+    --success: #10B981;
+    --card-shadow: rgba(0, 0, 0, 0.55);
+  }
+
+  /* 주간(라이트) 클린 테마 */
+  body.light-mode {
+    --bg: #F0F5FA;
+    --panel: #FFFFFF;
+    --panel-card: #E2EBF5;
+    --panel-card-hover: #CBD5E1;
+    --line: #CBD5E1;
+    --line-accent: rgba(59, 130, 246, 0.4);
+    --txt: #0F172A;
+    --muted: #334155;
+    --dim: #64748B;
+    --magenta-txt: #D91C6A;
+    --magenta-txt-light: #E02475;
+    --magenta-border: rgba(217, 28, 106, 0.4);
+    --magenta-bg: rgba(217, 28, 106, 0.08);
+    --magenta-glow: rgba(217, 28, 106, 0.15);
+    --primary: #2563EB;
+    --primary-light: #3B82F6;
+    --accent: #0D9488;
+    --rose: #E11D48;
+    --rose-bright: #F43F5E;
+    --orange: #D97706;
+    --orange-bright: #F59E0B;
+    --card-shadow: rgba(15, 23, 42, 0.08);
+  }
+
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body { 
+    margin: 0; 
+    background: var(--bg); 
+    color: var(--txt); 
+    overflow-x: hidden; 
+    scroll-snap-type: y proximity;
+    font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; 
+    -webkit-font-smoothing: antialiased;
+    letter-spacing: -0.3px;
+    transition: background-color .35s ease, color .35s ease;
+  }
+  a { color: var(--accent); text-decoration: none; }
+
+  /* Remotion 사파이어/틸 백그라운드 캔버스 */
+  #remotion-canvas {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: 0;
+    pointer-events: none;
+    opacity: 0.55; 
+    transition: opacity .5s ease;
+  }
+
+  /* 상단 실시간 슬림 프로그레스 바 */
+  .progress { 
+    position: fixed; 
+    top: 0; 
+    left: 0; 
+    height: 3px; 
+    width: 0; 
+    background: linear-gradient(90deg, var(--primary), var(--magenta-txt), var(--accent)); 
+    z-index: 999; 
+    transition: width .15s ease-out; 
+    box-shadow: 0 0 14px rgba(45, 212, 191, 0.85);
+  }
+
+  /* 맨상단 좌측 고정 타이틀 & 뱃지 헤더 바 */
+  .fixed-top-header {
+    position: fixed;
+    top: 20px;
+    left: 20px;
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: rgba(14, 23, 38, 0.85);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1.5px solid var(--line-accent);
+    border-radius: 9999px;
+    padding: 7px 18px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.45);
+    transition: all 0.3s ease;
+  }
+  body.light-mode .fixed-top-header {
+    background: rgba(255, 255, 255, 0.9);
+  }
+
+  .brand-badge {
+    background: rgba(45, 212, 191, 0.16);
+    color: var(--accent);
+    border: 1px solid rgba(45, 212, 191, 0.45);
+    font-size: 12px;
+    font-weight: 800;
+    padding: 4px 12px;
+    border-radius: 9999px;
+    letter-spacing: 0.6px;
+    box-shadow: 0 0 10px rgba(45, 212, 191, 0.25);
+    white-space: nowrap;
+  }
+
+  .brand-title {
+    color: var(--txt);
+    font-size: 14px;
+    font-weight: 700;
+    letter-spacing: -0.3px;
+    white-space: nowrap;
+  }
+
+  /* 맨하단 좌측 고정 '필요한 AI 커뮤니티' 브랜딩 푸터 바 */
+  .fixed-bottom-logo {
+    position: fixed;
+    bottom: 20px;
+    left: 20px;
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: rgba(14, 23, 38, 0.85);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1.5px solid var(--line-accent);
+    border-radius: 9999px;
+    padding: 8px 20px;
+    color: var(--txt);
+    font-size: 13.5px;
+    font-weight: 700;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.45);
+    transition: all 0.25s ease;
+    text-decoration: none;
+  }
+  .fixed-bottom-logo:hover {
+    border-color: var(--accent);
+    transform: translateY(-3px);
+    box-shadow: 0 0 20px rgba(45, 212, 191, 0.45), 0 10px 25px rgba(0,0,0,0.6);
+    color: var(--accent);
+  }
+  body.light-mode .fixed-bottom-logo {
+    background: rgba(255, 255, 255, 0.9);
+  }
+
+  @media(max-width: 860px) {
+    .fixed-top-header { padding: 5px 12px; gap: 8px; font-size: 12px; }
+    .brand-title { font-size: 12px; }
+    .brand-badge { font-size: 11px; padding: 3px 8px; }
+    .fixed-bottom-logo { font-size: 12px; padding: 6px 14px; bottom: 16px; left: 16px; }
+  }
+
+  /* 우측 상단 고정 툴바 */
+  .viewer-toolbar {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(14, 23, 38, 0.85);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid var(--line-accent);
+    border-radius: 9999px;
+    padding: 6px 14px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.45);
+  }
+  body.light-mode .viewer-toolbar {
+    background: rgba(255, 255, 255, 0.9);
+  }
+
+  /* 상단 퀵 슬라이드 셀렉터 */
+  .slide-select-nav {
+    background: #08111F;
+    color: var(--accent);
+    border: 1px solid rgba(45, 212, 191, 0.4);
+    font-size: 13px;
+    font-weight: 700;
+    padding: 5px 12px;
+    border-radius: 9999px;
+    cursor: pointer;
+    outline: none;
+    font-family: inherit;
+    transition: all .2s ease;
+  }
+  .slide-select-nav:hover {
+    border-color: var(--accent);
+    box-shadow: 0 0 14px rgba(45, 212, 191, 0.45);
+  }
+  body.light-mode .slide-select-nav {
+    background: #E2EBF5;
+    color: #0D9488;
+  }
+
+  .tool-btn {
+    background: transparent;
+    border: none;
+    color: var(--txt);
+    font-size: 13px;
+    font-weight: 600;
+    padding: 6px 12px;
+    border-radius: 9999px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    transition: all .2s cubic-bezier(0.4, 0, 0.2, 1);
+    font-family: inherit;
+  }
+  .tool-btn:hover {
+    background: var(--panel-card);
+    color: var(--accent);
+  }
+  .tool-btn.active {
+    background: var(--primary);
+    color: #ffffff !important;
+    box-shadow: 0 4px 14px rgba(59, 130, 246, 0.4);
+  }
+
+  /* 모바일 바 */
+  .mobile-bottom-bar {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 1000;
+    display: none;
+    align-items: center;
+    gap: 10px;
+    background: rgba(14, 23, 38, 0.9);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1.5px solid var(--line-accent);
+    border-radius: 9999px;
+    padding: 8px 18px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.7), 0 0 20px rgba(59, 130, 246, 0.35);
+  }
+  .mobile-bottom-bar .tool-btn {
+    background: var(--panel-card);
+    border: 1px solid var(--line);
+    color: var(--txt);
+    padding: 8px 18px;
+    font-size: 13.5px;
+    font-weight: 700;
+  }
+  .mobile-bottom-bar .tool-btn:hover, .mobile-bottom-bar .tool-btn:active {
+    background: var(--primary);
+    color: #fff;
+    border-color: transparent;
+    box-shadow: 0 0 14px rgba(59, 130, 246, 0.6);
+  }
+
+  @media(max-width: 768px) {
+    .mobile-bottom-bar { display: flex; }
+  }
+  body.mobile-view .mobile-bottom-bar {
+    display: flex !important;
+  }
+
+  /* 텍스트 그래디언트 */
+  .gold { 
+    background: linear-gradient(135deg, #60A5FA, #2DD4BF); 
+    -webkit-background-clip: text; 
+    background-clip: text; 
+    color: transparent; 
+  }
+  .grad { 
+    background: linear-gradient(90deg, #60A5FA, var(--magenta-txt-light), #2DD4BF, #60A5FA); 
+    background-size: 300% 100%;
+    -webkit-background-clip: text; 
+    background-clip: text; 
+    color: transparent; 
+    animation: shine 6s linear infinite; 
+  }
+  @keyframes shine { to { background-position: 300% 0; } }
+
+  /* 슬라이드 레이아웃 */
+  .slide { 
+    min-height: 100vh; 
+    display: flex; 
+    flex-direction: column; 
+    justify-content: center; 
+    align-items: center;
+    text-align: center; 
+    padding: 70px 24px; 
+    position: relative; 
+    scroll-snap-align: start; 
+    border-bottom: 1px solid var(--line);
+    z-index: 1;
+  }
+  .inner { 
+    max-width: 1040px; 
+    width: 100%; 
+    opacity: 0; 
+    transform: translateY(20px); 
+    transition: opacity .7s ease, transform .8s cubic-bezier(.16, 1, .3, 1); 
+    position: relative;
+    z-index: 2;
+  }
+  .slide.in .inner { opacity: 1; transform: none; }
+
+  h2 { font-size: clamp(28px, 4.8vw, 44px); font-weight: 800; letter-spacing: -1.2px; line-height: 1.2; margin: 0; }
+  .sub { color: var(--muted); font-size: clamp(15px, 2vw, 18px); margin-top: 14px; line-height: 1.75; max-width: 800px; margin-left: auto; margin-right: auto; }
+  .sub b { color: var(--txt); font-weight: 700; }
+
+  .pill { 
+    display: inline-flex; 
+    align-items: center;
+    gap: 6px;
+    font-size: 13px; 
+    font-weight: 700; 
+    color: var(--magenta-txt) !important;
+    border: 1px solid var(--magenta-border); 
+    background: var(--magenta-bg); 
+    padding: 6px 18px; 
+    border-radius: 9999px; 
+    margin-bottom: 20px; 
+    box-shadow: 0 0 12px var(--magenta-glow);
+    transition: all 0.3s ease;
+  }
+  .pill:hover {
+    color: var(--magenta-txt-light) !important;
+    box-shadow: 0 0 18px rgba(255, 42, 133, 0.35);
+  }
+
+  .chapter { 
+    display: inline-flex; 
+    align-items: center; 
+    gap: 8px; 
+    font-size: 12px; 
+    font-weight: 800; 
+    letter-spacing: 0.8px; 
+    color: var(--magenta-txt) !important;
+    border: 1px solid var(--magenta-border); 
+    background: var(--magenta-bg); 
+    padding: 6px 16px; 
+    border-radius: 8px; 
+    text-transform: uppercase; 
+    margin-bottom: 20px; 
+    box-shadow: 0 0 12px var(--magenta-glow);
+    transition: all 0.3s ease;
+  }
+
+  .class-meta {
+    margin-top: 24px;
+    display: inline-flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 16px 28px;
+    font-size: 14px;
+    color: var(--muted);
+    background: rgba(23, 36, 56, 0.6);
+    border: 1px solid var(--line);
+    border-radius: 9999px;
+    padding: 10px 28px;
+  }
+  .class-meta > div {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .class-meta b { color: var(--txt); }
+
+  .kpis { display: flex; flex-wrap: wrap; gap: 14px; justify-content: center; margin-top: 28px; }
+  .kpi { 
+    background: var(--panel); 
+    border: 1px solid var(--line); 
+    border-radius: 12px; 
+    padding: 16px 26px; 
+    min-width: 160px; 
+    transition: all .3s cubic-bezier(.16, 1, .3, 1); 
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  }
+  .kpi:hover { 
+    border-color: #60A5FA; 
+    transform: translateY(-4px); 
+    box-shadow: 0 0 25px rgba(59, 130, 246, 0.4), 0 14px 28px rgba(0, 0, 0, 0.55); 
+  }
+  .kpi b { display: block; font-size: clamp(22px, 3.2vw, 28px); font-weight: 800; line-height: 1.1; color: var(--primary-light); } 
+  .kpi span { font-size: 12px; color: var(--muted); margin-top: 6px; display: block; }
+
+  .three { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; margin: 28px auto 0; text-align: left; }
+  @media(max-width: 840px) { .three { grid-template-columns: 1fr; } }
+  
+  .tc { 
+    background: var(--panel); 
+    border: 1px solid var(--line); 
+    border-radius: 16px; 
+    padding: 26px; 
+    transition: transform .3s cubic-bezier(.16, 1, .3, 1), border-color .3s ease, box-shadow .3s ease; 
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.35);
+  }
+  .tc:hover { 
+    transform: translateY(-6px); 
+    border-color: #60A5FA; 
+    box-shadow: 0 0 25px rgba(59, 130, 246, 0.45), 0 16px 36px rgba(0, 0, 0, 0.65); 
+  }
+
+  .tc .tn { 
+    width: auto;
+    min-width: 68px;
+    height: 38px; 
+    padding: 0 14px;
+    border-radius: 10px; 
+    background: rgba(59, 130, 246, 0.14); 
+    border: 1px solid var(--line-accent);
+    color: var(--primary-light); 
+    font-weight: 800; 
+    display: inline-flex; 
+    align-items: center; 
+    justify-content: center; 
+    font-size: 13.5px; 
+    white-space: nowrap;
+    word-break: keep-all;
+    transition: all 0.25s ease;
+  }
+
+  .tc .tn.step-1, .tn-step1 {
+    background: rgba(59, 130, 246, 0.16) !important;
+    border: 1px solid rgba(59, 130, 246, 0.45) !important;
+    color: #60A5FA !important;
+    box-shadow: 0 0 10px rgba(59, 130, 246, 0.2);
+  }
+  .tc .tn.step-2, .tn-step2 {
+    background: rgba(45, 212, 191, 0.16) !important;
+    border: 1px solid rgba(45, 212, 191, 0.45) !important;
+    color: #2DD4BF !important;
+    box-shadow: 0 0 10px rgba(45, 212, 191, 0.2);
+  }
+  .tc .tn.step-3, .tn-step3 {
+    background: rgba(245, 158, 11, 0.16) !important;
+    border: 1px solid rgba(245, 158, 11, 0.45) !important;
+    color: #FBBF24 !important;
+    box-shadow: 0 0 10px rgba(245, 158, 11, 0.2);
+  }
+  .tc .tn.step-4, .tn-step4 {
+    background: rgba(255, 83, 165, 0.16) !important;
+    border: 1px solid rgba(255, 83, 165, 0.45) !important;
+    color: #FF53A5 !important;
+    box-shadow: 0 0 10px rgba(255, 83, 165, 0.2);
+  }
+
+  .tc h4 { font-size: 17px; font-weight: 700; margin: 16px 0 8px; color: var(--txt); } 
+  .tc p { font-size: 14px; color: var(--muted); line-height: 1.65; margin: 0; } 
+  .tc p b { color: var(--txt); }
+
+  .interactive-card {
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
+    border: 1.5px solid var(--line-accent);
+  }
+  .interactive-card:hover {
+    transform: translateY(-4px);
+    border-color: #60A5FA;
+    box-shadow: 0 0 30px rgba(59, 130, 246, 0.45), 0 20px 40px rgba(0, 0, 0, 0.7);
+  }
+
+  .fact { text-align: left; max-width: 850px; margin: 28px auto 0; display: grid; gap: 14px; }
+  .fact .f { 
+    background: var(--panel); 
+    border: 1px solid var(--line); 
+    border-left: 4px solid var(--primary); 
+    border-radius: 0 14px 14px 0; 
+    padding: 18px 24px; 
+    font-size: 15px; 
+    line-height: 1.65; 
+    box-shadow: 0 6px 16px rgba(0,0,0,0.35);
+    transition: all 0.3s ease;
+  }
+  .fact .f:hover {
+    border-color: #60A5FA;
+    box-shadow: 0 0 20px rgba(59, 130, 246, 0.35), 0 10px 25px rgba(0,0,0,0.55);
+  }
+  .fact .f b { color: var(--primary-light); } 
+  .fact .f span { color: var(--muted); }
+
+  /* ⏱️ 디지털 타이머 박스 UI */
+  .timer-widget.large { 
+    display: flex; 
+    align-items: center; 
+    justify-content: space-between; 
+    gap: 20px; 
+    background: var(--panel); 
+    border: 1.5px solid var(--line-accent); 
+    border-radius: 16px; 
+    padding: 14px 24px; 
+    margin-top: 14px;
+    width: 100%;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.45);
+    transition: all 0.3s ease;
+  }
+  .timer-widget.large:hover {
+    border-color: #2DD4BF;
+    box-shadow: 0 0 25px rgba(45, 212, 191, 0.35), 0 16px 36px rgba(0, 0, 0, 0.65);
+  }
+  .digital-clock-box {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: var(--bg);
+    border: 1px solid var(--line-accent);
+    border-radius: 12px;
+    padding: 8px 22px;
+    box-shadow: inset 0 2px 8px rgba(0,0,0,0.4);
+  }
+  .timer-widget.large .timer-time { 
+    font-size: 36px; 
+    font-weight: 800; 
+    color: var(--accent); 
+    font-family: 'Courier New', Courier, monospace; 
+    letter-spacing: 3px; 
+    line-height: 1;
+    text-shadow: 0 0 12px rgba(45, 212, 191, 0.6);
+  }
+  
+  .timer-btns {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .timer-widget.large .tbtn { 
+    border: none; 
+    border-radius: 10px; 
+    padding: 10px 20px; 
+    font-size: 14px; 
+    font-weight: 700; 
+    cursor: pointer; 
+    font-family: inherit; 
+    transition: all 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    white-space: nowrap;
+  }
+  
+  .timer-widget.large .tbtn.label-btn {
+    background: rgba(45, 212, 191, 0.12);
+    color: var(--accent);
+    border: 1px solid rgba(45, 212, 191, 0.35);
+    cursor: default;
+    font-weight: 800;
+  }
+  
+  .timer-widget.large .tbtn.start {
+    background: var(--primary);
+    color: #ffffff;
+    box-shadow: 0 4px 14px rgba(59, 130, 246, 0.4);
+  }
+  .timer-widget.large .tbtn.start:hover {
+    background: var(--primary-light);
+    box-shadow: 0 0 15px rgba(59, 130, 246, 0.6);
+  }
+  .timer-widget.large .tbtn.reset {
+    background: var(--panel-card);
+    color: var(--txt);
+    border: 1px solid var(--line);
+  }
+  .timer-widget.large .tbtn.reset:hover {
+    background: var(--panel-card-hover);
+    color: var(--accent);
+  }
+  .timer-widget.large .tbtn:active { transform: scale(0.97); }
+
+  /* 프롬프트 스타일 박스 */
+  .doc { 
+    max-width: 720px; 
+    width: 100%; 
+    margin: 0 auto; 
+    background: #071222; 
+    border: 1.5px solid var(--line-accent); 
+    border-radius: 14px; 
+    padding: 18px; 
+    text-align: left; 
+    box-shadow: 0 12px 30px rgba(0,0,0,0.55); 
+    color: var(--txt); 
+    position: relative; 
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .doc:hover, .doc.selected {
+    border-color: #60A5FA;
+    box-shadow: 0 0 30px rgba(59, 130, 246, 0.45), 0 20px 45px rgba(0, 0, 0, 0.75);
+  }
+  .doc .dtag { 
+    font-size: 11px; 
+    font-weight: 700; 
+    color: var(--accent); 
+    letter-spacing: .5px; 
+    text-transform: uppercase; 
+    border: 1px solid rgba(45, 212, 191, 0.35); 
+    background: rgba(45, 212, 191, 0.08);
+    padding: 4px 10px; 
+    border-radius: 6px; 
+    display: inline-block; 
+    margin-bottom: 10px; 
+  }
+  .doc h4 { font-size: 15px; font-weight: 700; margin: 0 0 10px; color: var(--txt); line-height: 1.35; }
+  .doc pre { 
+    background: var(--panel); 
+    padding: 14px 16px; 
+    border-radius: 10px; 
+    overflow-x: auto; 
+    font-size: 13.5px; 
+    color: var(--primary-light); 
+    border: 1px solid var(--line); 
+    margin: 0; 
+    font-family: monospace; 
+    white-space: pre-wrap;
+    word-break: break-all;
+    line-height: 1.6;
+  }
+
+  .easy-prompt-card {
+    margin-top: 14px;
+    background: rgba(23, 36, 56, 0.6);
+    border: 1.5px solid var(--line-accent);
+    border-radius: 12px;
+    padding: 14px 18px;
+    font-size: 14px;
+    color: var(--txt);
+    line-height: 1.65;
+    text-align: left;
+    box-shadow: 0 6px 18px rgba(0,0,0,0.35);
+    transition: all 0.3s ease;
+  }
+  .easy-prompt-card:hover {
+    border-color: #60A5FA;
+    box-shadow: 0 0 25px rgba(59, 130, 246, 0.4), 0 14px 30px rgba(0,0,0,0.55);
+  }
+  .easy-prompt-card b {
+    color: var(--accent);
+    font-weight: 700;
+  }
+  .easy-prompt-card span {
+    color: var(--txt);
+    font-weight: 600;
+  }
+
+  .doc-btn-group {
+    position: absolute; 
+    top: 18px; 
+    right: 18px; 
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .doc .copy-btn, .doc .zoom-btn { 
+    background: var(--panel); 
+    color: var(--txt); 
+    border: 1px solid var(--line); 
+    padding: 6px 12px; 
+    border-radius: 8px; 
+    font-size: 12px; 
+    cursor: pointer; 
+    font-weight: 600; 
+    transition: all .2s ease; 
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-family: inherit;
+  }
+  .doc .copy-btn:hover, .doc .zoom-btn:hover { background: var(--primary); color: #fff; border-color: transparent; box-shadow: 0 0 12px rgba(59, 130, 246, 0.6); }
+
+  .next-class-box {
+    text-align: center; 
+    background: rgba(23, 36, 56, 0.5); 
+    border: 1.5px solid rgba(245, 158, 11, 0.4); 
+    padding: 38px 32px 42px; 
+    border-radius: 20px;
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.45);
+  }
+  .next-class-box:hover {
+    border-color: var(--orange-bright);
+    box-shadow: 0 0 35px rgba(245, 158, 11, 0.45), 0 20px 45px rgba(0, 0, 0, 0.75);
+    transform: translateY(-4px);
+  }
+
+  .next-class-title {
+    font-size: clamp(26px, 4vw, 34px);
+    font-weight: 900;
+    color: var(--orange-bright);
+    letter-spacing: -0.8px;
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    text-shadow: 0 0 16px rgba(245, 158, 11, 0.4);
+  }
+
+  #prompt-modal {
+    position: fixed;
+    inset: 0;
+    background: rgba(6, 14, 26, 0.94);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    z-index: 10000;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+  }
+  #prompt-modal.show {
+    display: flex;
+  }
+  .modal-box {
+    background: var(--panel);
+    border: 2px solid #60A5FA;
+    border-radius: 20px;
+    max-width: 920px;
+    width: 100%;
+    padding: 32px;
+    box-shadow: 0 0 40px rgba(59, 130, 246, 0.4), 0 30px 60px rgba(0,0,0,0.9);
+    text-align: left;
+    position: relative;
+  }
+  .modal-box h3 {
+    font-size: 22px;
+    font-weight: 800;
+    color: var(--primary-light);
+    margin: 0 0 18px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .modal-box pre {
+    background: #071222;
+    border: 1px solid var(--line);
+    padding: 22px;
+    border-radius: 14px;
+    font-size: clamp(16px, 2.2vw, 21px);
+    line-height: 1.7;
+    color: var(--accent);
+    white-space: pre-wrap;
+    word-break: break-all;
+    font-family: 'Pretendard', monospace;
+    max-height: 45vh;
+    overflow-y: auto;
+  }
+  .modal-close-btn {
+    background: var(--panel-card);
+    border: 1px solid var(--line);
+    color: var(--txt);
+    font-size: 14px;
+    font-weight: 700;
+    padding: 8px 18px;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all .2s;
+  }
+  .modal-close-btn:hover {
+    background: var(--primary);
+    color: #fff;
+  }
+
+  .dots { 
+    position: fixed; 
+    right: 18px; 
+    top: 50%; 
+    transform: translateY(-50%); 
+    z-index: 60; 
+    display: flex; 
+    flex-direction: column; 
+    gap: 7px; 
+    align-items: flex-end;
+    background: rgba(14, 23, 38, 0.85);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: none !important;
+    padding: 10px 8px;
+    border-radius: 9999px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.55);
+  }
+  .dots a { 
+    width: 28px; 
+    height: 14px; 
+    border-radius: 9999px; 
+    background: rgba(255, 255, 255, 0.18);
+    transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1); 
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    color: var(--txt);
+    font-size: 10px;
+    font-weight: 800;
+    text-decoration: none;
+  }
+  .dots a:hover {
+    background: var(--magenta-txt-light);
+    width: 38px;
+    height: 18px;
+    box-shadow: 0 0 12px rgba(255, 83, 165, 0.9);
+  }
+  .dots a.on { 
+    background: linear-gradient(135deg, var(--primary), var(--magenta-txt)); 
+    width: 44px;
+    height: 20px;
+    box-shadow: 0 0 16px rgba(255, 83, 165, 0.9); 
+  }
+  .dots a::before {
+    content: attr(data-num);
+  }
+  .dots a::after {
+    content: attr(data-title);
+    position: absolute;
+    right: 50px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: rgba(14, 23, 38, 0.95);
+    border: 1.5px solid var(--magenta-border);
+    color: var(--txt);
+    font-size: 12px;
+    font-weight: 800;
+    padding: 5px 12px;
+    border-radius: 8px;
+    white-space: nowrap;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s ease, transform 0.2s ease;
+    box-shadow: 0 6px 18px rgba(0,0,0,0.6);
+  }
+  .dots a:hover::after {
+    opacity: 1;
+    transform: translateY(-50%) translateX(-4px);
+  }
+  @media(max-width: 768px) { .dots { display: none; } }
+
+  .hint { 
+    position: fixed; 
+    bottom: 24px; 
+    left: 50%; 
+    transform: translateX(-50%); 
+    color: var(--dim); 
+    font-size: 12px; 
+    letter-spacing: 1px; 
+    z-index: 60; 
+    animation: bob 2s ease-in-out infinite; 
+  }
+  @keyframes bob { 
+    0%, 100% { transform: translateX(-50%) translateY(0); } 
+    50% { transform: translateX(-50%) translateY(6px); } 
+  }
+
+  #toast-message { 
+    position: fixed; 
+    top: 24px; 
+    left: 50%; 
+    transform: translateX(-50%) translateY(-20px); 
+    background: var(--primary); 
+    color: white; 
+    font-weight: 700; 
+    padding: 12px 26px; 
+    border-radius: 9999px; 
+    box-shadow: 0 10px 30px rgba(59, 130, 246, 0.45); 
+    opacity: 0; 
+    pointer-events: none; 
+    transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1); 
+    z-index: 9999; 
+    display: flex; 
+    align-items: center; 
+    gap: 8px; 
+  }
+  #toast-message.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+  .prompt-bad-box {
+    border: 1px solid var(--line) !important;
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
+  }
+  .prompt-bad-box:hover {
+    border-color: rgba(244, 63, 94, 0.8) !important;
+    box-shadow: 0 0 25px rgba(244, 63, 94, 0.4), 0 16px 36px rgba(0, 0, 0, 0.6) !important;
+    transform: translateY(-4px) !important;
+  }
+
+  .prompt-good-box {
+    border: 1px solid var(--line) !important;
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
+  }
+  .prompt-good-box:hover {
+    border-color: #60A5FA !important;
+    box-shadow: 0 0 25px rgba(59, 130, 246, 0.45), 0 16px 36px rgba(0, 0, 0, 0.6) !important;
+    transform: translateY(-4px) !important;
+  }
+</style>
+</head>
+<body>
+
+<!-- Remotion 캔버스 -->
+<canvas id="remotion-canvas"></canvas>
+
+<!-- 상단 실시간 진행 표시줄 -->
+<div class="progress" id="pbar"></div>
+
+<!-- 📌 맨 상단 좌측 고정 브랜딩 헤더 -->
+<div class="fixed-top-header">
+  <span class="brand-badge">AI DESIGN</span>
+  <span class="brand-title">🎨 열린강좌 3: AI로 나만의 포스터 만들기</span>
+</div>
+
+<!-- 📌 맨 하단 좌측 고정 '필요한 AI 커뮤니티' 브랜딩 로고 -->
+<a href="https://drive.google.com/file/d/1LkmCFJSNKkLqHdauhgMwhd9ERnkvO48q/view?usp=sharing" target="_blank" rel="noopener noreferrer" class="fixed-bottom-logo" title="필요한 AI 커뮤니티 구글 드라이브 연결">
+  <img src="https://bobostar-ai.github.io/html-Project/PYH%20Ai%20Comm.png" alt="필요한 AI 커뮤니티" style="height: 22px; width: auto; object-fit: contain;" />
+  <span>필요한 AI 커뮤니티</span>
+</a>
+
+<!-- 우측 터치 친화형 캡슐 네비게이터 -->
+<div class="dots" id="dots"></div>
+
+<!-- 하단 스크롤 힌트 -->
+<div class="hint">스크롤 ↓</div>
+
+<!-- 상단 우측 고정 뷰어 컨트롤 툴바 (20개 슬라이드 전체 등록) -->
+<div class="viewer-toolbar">
+  <select class="slide-select-nav" id="slide-select-nav" onchange="goToSlide(parseInt(this.value, 10))" title="원하는 슬라이드로 바로 이동">
+    <option value="1">01. 표지 (AI 포스터 디자인)</option>
+    <option value="2">02. 강의 목표 (누구나 가능 100분)</option>
+    <option value="3">03. AI 포스터 제작이란?</option>
+    <option value="4">04. 포스터 제작 3대 원칙</option>
+    <option value="5">05. 실습 진행 단계 (4단계)</option>
+    <option value="6">06. [1부] AI 포스터 기획 & 카피</option>
+    <option value="7">07. [1부] AI 배경 이미지 생성</option>
+    <option value="8">08. [2부] 미리캔버스 세팅 & 업로드</option>
+    <option value="9">09. [2부] 미리캔버스 텍스트 & 레이아웃</option>
+    <option value="10">10. [2부] 미리캔버스 3대 디자인 꿀팁 💡</option>
+    <option value="11">11. [2부] 고화질 저장 & 카톡 공유 💾</option>
+    <option value="12">12. [팁] AI 광고 심의 & 피칭 ⚖️</option>
+    <option value="13">13. 5060 맞춤 AI 프롬프트 비법</option>
+    <option value="14">14. 좋은 vs 나쁜 프롬프트 비교</option>
+    <option value="15">15. 자주 묻는 질문(FAQ) & 해결 ❓</option>
+    <option value="16">16. 실습 응용 주제 추천 4종</option>
+    <option value="17">17. 🧠 [전체 총복습] 1분 요약 정리</option>
+    <option value="18">18. 오늘 배운 성과 마무리</option>
+    <option value="19">19. ✨ 한방에 만드는 포스터 샘플 프롬프트</option>
+    <option value="20">20. 🎁 [강사 선물] 카페 음료 포스터 마스터</option>
+    <option value="21">21. 수고하셨습니다 👏 (다음 2차 특강)</option>
+  </select>
+
+  <button class="tool-btn" id="btn-theme" title="야간/주간 테마 전환">☀️/🌙 <span>야간</span></button>
+  <button class="tool-btn" id="btn-fullscreen" title="전체화면 켜기/끄기">🖥️ <span>전체화면</span></button>
+  <button class="tool-btn" id="btn-mobile-view" title="모바일앱 최적화 뷰">📱 <span>모바일뷰</span></button>
+</div>
+
+<!-- 모바일 전용 하단 바 -->
+<div class="mobile-bottom-bar" id="mobile-bottom-bar">
+  <button class="tool-btn" onclick="prevSlide()">◀ 이전</button>
+  <button class="tool-btn" onclick="goToSlide(1)">🏠 홈</button>
+  <button class="tool-btn" onclick="nextSlide()">다음 ▶</button>
+</div>
+
+<!-- 01. 표지 -->
+<section class="slide cover" data-title="01. 표지">
+  <div class="inner">
+    <div class="chapter">🎓 필요한 AI 무료강의 3탄 · 디자인 몰라도 OK!</div>
+    <h1 style="font-size: clamp(32px, 5.5vw, 60px); font-weight: 900; margin: 0 0 16px; letter-spacing: -1.5px;">AI로 만드는 포스터디자인</h1>
+    <h3 class="grad" style="font-size: clamp(16px, 3vw, 24px); font-weight: 800; margin: 0 0 24px; letter-spacing: 1px;">말로 하는 포스터 제작 + 미리캔버스 최종 편집 (100분 완결)</h3>
+    
+    <div class="class-meta">
+      <div>📅 <b>일시:</b> 2026.08.27 (목) 오후 4시~6시</div>
+      <div>📍 <b>장소:</b> 전태일기념관 4층 교육실</div>
+      <div>👨‍🏫 <b>강사:</b> 서현(필요한 AI 커뮤니티)</div>
+    </div>
+    
+    <div class="kpis">
+      <div class="kpi"><b class="gold">100% AI 문구/이미지</b><span>기획부터 이미지 생성까지</span></div>
+      <div class="kpi"><b class="gold">미리캔버스 마감</b><span>초보자 맞춤 쉽고 완벽 편집</span></div>
+      <div class="kpi"><b class="gold">나만의 포스터 완성</b><span>모바일 & 인쇄용 A4 다운로드</span></div>
+    </div>
+
+    <div style="display: flex; align-items: center; justify-content: center; gap: 16px; margin-top: 152px; flex-wrap: wrap;">
+      <a href="https://drive.google.com/file/d/1LkmCFJSNKkLqHdauhgMwhd9ERnkvO48q/view?usp=sharing" target="_blank" rel="noopener noreferrer" style="background: rgba(255, 255, 255, 0.95); padding: 8px 18px; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.2); display: flex; align-items: center; justify-content: center; height: 52px; transition: transform 0.2s ease, box-shadow 0.2s ease;" title="필요한 AI 커뮤니티 구글 드라이브 연결" onmouseover="this.style.transform='scale(1.04)'" onmouseout="this.style.transform='scale(1)'">
+        <img src="https://bobostar-ai.github.io/html-Project/PYH%20Ai%20Comm.png" alt="필요한 AI 커뮤니티" style="height: 36px; width: auto; object-fit: contain;" />
+      </a>
+      <div style="background: rgba(255, 255, 255, 0.95); padding: 8px 18px; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.2); display: flex; align-items: center; justify-content: center; height: 52px;">
+        <img src="https://cdn-taeil.ictact.kr/assets/img/introduction/wordmark-3.png" alt="전태일기념관" style="max-height: 24px; width: auto; object-fit: contain;" />
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 02. 오늘 목표 -->
+<section class="slide" data-title="02. 강의 목표">
+  <div class="inner">
+    <div class="pill">🎯 강의 목표</div>
+    <h2>복잡한 디자인 프로그램은 필요 없습니다.</h2>
+    <p class="sub" style="font-size: 20px; font-weight: 700; margin-bottom: 28px;">"AI 대화 몇 줄과 미리캔버스 꿀팁만으로 내 아이디어를 멋진 포스터로 만듭니다."</p>
+    <div class="three" style="max-width: 850px; margin: 0 auto;">
+      <div class="tc"><div class="tn step-1">1단계</div><h4>1단계: 아이디어 발상</h4><p>동네 모임, 개인 행사, 봉사활동 등 주제를 말로 설명합니다.</p></div>
+      <div class="tc"><div class="tn step-2">2단계</div><h4>2단계: AI 디자인 생성</h4><p>AI 챗봇으로 포스터 카피를 뽑고 수채화/일러스트 배경을 만듭니다.</p></div>
+      <div class="tc"><div class="tn step-3">3단계</div><h4>3단계: 미리캔버스 편집</h4><p>쉽고 강력한 미리캔버스에서 글자와 요소를 깔끔하게 얹습니다.</p></div>
+      <div class="tc" style="grid-column: span 3; text-align: center;"><div class="tn step-4" style="margin: 0 auto;">4단계</div><h4 style="margin-top:10px;">4단계: 나만의 포스터 완성 & 카톡/인쇄 저장</h4><p>외부 디자이너 없이 내 손으로 뚝딱 완성한 작품을 다운로드하여 공유합니다.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- 03. AI 포스터 제작이란 -->
+<section class="slide" data-title="03. AI 포스터 제작이란">
+  <div class="inner">
+    <div class="pill">💡 시대의 변화</div>
+    <h2>외부 디자이너 없이 내 손으로 뚝딱!</h2>
+    <p class="sub">수십만 원 외주 비용이나 포토샵 공부 없이 포스터를 만드는 새로운 방법입니다.</p>
+    <div class="three" style="max-width: 850px; margin: 32px auto 0;">
+      <div class="tc" style="border-color: rgba(244, 63, 94, 0.3); background: rgba(244, 63, 94, 0.04);">
+        <div class="tn" style="background: rgba(244, 63, 94, 0.15); border-color: rgba(244, 63, 94, 0.4); color: var(--rose);">기존방식</div>
+        <h4>예전의 포스터 제작</h4>
+        <p style="font-size: 15px; margin-top: 10px;">
+          아이디어 구상<br>
+          ↓<br>
+          <b>외주 디자이너 계약 or 포토샵 공부</b><br>
+          ↓<br>
+          수정 요청 소통에 며칠씩 소요 (시간/비용 좌절)
+        </p>
+      </div>
+      <div class="tc" style="grid-column: span 2; background: var(--panel);">
+        <div class="tn" style="background: rgba(59, 130, 246, 0.15); border-color: var(--line-accent); color: var(--primary-light);">AI방식</div>
+        <h4>오늘의 AI + 미리캔버스 제작 (100분 완결)</h4>
+        <p style="font-size: 15px; margin-top: 10px;">
+          아이디어 구상 💡<br>
+          ↓<br>
+          <b>AI(Gemini·ChatGPT)에게 "산악회 총회 문구와 수채화 배경 만들어줘" 💬</b><br>
+          ↓<br>
+          <b>무료 웹앱 '미리캔버스'에서 생성 이미지 얹고 폰트 정렬 🎨</b><br>
+          ↓<br>
+          고화질 포스터 즉각 로딩 및 카톡/A4 출력 완료! 🚀
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 04. 포스터 제작 3대 원칙 -->
+<section class="slide" data-title="04. 포스터 제작 3대원칙">
+  <div class="inner">
+    <div class="pill">🔑 성공 핵심</div>
+    <h2>AI 포스터 제작의 3대 핵심 원칙</h2>
+    <p class="sub">이 3가지만 기억하면 5060 시니어 초보자도 한 번에 멋진 포스터를 만듭니다.</p>
+    <div class="three" style="max-width: 850px; margin: 28px auto 0;">
+      <div class="tc">
+        <div class="tn step-1">원칙 1</div>
+        <h4>4대 필수 요소 도출</h4>
+        <p>강렬한 헤드카피, 일시/장소, 주요 내용, 문의처를 AI로 깔끔하게 정리합니다.</p>
+      </div>
+      <div class="tc">
+        <div class="tn step-2">원칙 2</div>
+        <h4>글씨 넣을 여백 확보</h4>
+        <p>AI에게 이미지를 만들 때 상단이나 하단에 복잡하지 않은 넉넉한 여백을 요청합니다.</p>
+      </div>
+      <div class="tc">
+        <div class="tn step-3">원칙 3</div>
+        <h4>미리캔버스 정교한 마감</h4>
+        <p>생성된 이미지에 미리캔버스의 깔끔한 폰트와 스티커를 결합해 가독성을 높입니다.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 05. 진행 방식 -->
+<section class="slide" data-title="05. 실습 진행 단계">
+  <div class="inner">
+    <div class="pill">🔄 100분 세부 커리큘럼</div>
+    <h2>오늘의 실습 100분 진행 과정</h2>
+    <p class="sub">1부와 2부로 나뉘어 기획부터 완성물 공유까지 순서대로 따라갑니다.</p>
+    <div class="three">
+      <div class="tc"><div class="tn step-1">1부 과정</div><h4>[1부] AI 문구 & 이미지 생성 (40분)</h4><p>AI 챗봇으로 포스터 카피라이팅을 추출하고 메인 배경 이미지를 프롬프트로 생성합니다.</p></div>
+      <div class="tc"><div class="tn step-2">2부 과정</div><h4>[2부] 미리캔버스 합성 & 완성 (50분)</h4><p>미리캔버스에 이미지를 얹고 폰트 배치, 가독성 검수 및 A4/모바일 다운로드를 진행합니다.</p></div>
+      <div class="tc"><div class="tn step-4">마무리</div><h4>[마무리] 단톡방 제출 & 피드백 (10분)</h4><p>서로가 만든 포스터를 공유하고 축하와 피드백을 주고받습니다.</p></div>
+    </div>
+    <div class="fact" style="margin-top: 28px;">
+      <div class="f"><b>👨‍🏫 강사 조언</b> <span>— 막히는 부분이 있으면 당황하지 말고 손을 들거나 AI에게 "어떻게 해야 해?"라고 물어보세요!</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- 06. [1부] AI 포스터 기획 & 카피라이팅 -->
+<section class="slide" data-title="06. [1부] AI 카피라이팅">
+  <div class="inner">
+    <div class="pill">📝 [1부] AI 포스터 기획 & 카피라이팅 (15분)</div>
+    <div class="pb-3">
+      <h2 style="text-align: left;">크리에이티브 브리프 기획 & 카피라이팅 도출</h2>
+      <p style="text-align: left; color: var(--muted); margin: 6px 0 16px; font-size: 15px;">실제 광고 기획처럼 타깃 분석, 핵심 가치(USP), 콘셉트 키워드 3종 및 4대 필수 문구를 한눈에 정리합니다.</p>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 my-auto items-stretch text-left" style="display:grid; grid-template-columns: 8fr 4fr; gap:20px;">
+      <div class="flex flex-col justify-between">
+        <div class="doc selected" style="margin: 0; max-width: 100%;">
+          <div class="dtag">Prompt 1 · Creative Director Brief</div>
+          <div class="doc-btn-group">
+            <button class="zoom-btn" onclick="openPromptModal('prompt-1', 'easy-prompt-1')">🔍 확대</button>
+            <button class="copy-btn" onclick="copyPrompt('prompt-1', this)">📋 복사</button>
+          </div>
+          <h4>AI 챗봇(Gemini, ChatGPT) 크리에이티브 디렉터 기획 프롬프트</h4>
+          <pre id="prompt-1">"너는 15년 차 광고대행사 크리에이티브 디렉터야. [제품/브랜드/모임명, 예: 60대 동네 산악회 단풍 산행 or 무설탕 말차 음료]의 홍보 포스터를 기획하려고 해.
+
+1. 타깃 고객층을 사로잡을 핵심 문제 정의 및 감성 포인트
+2. 이 모임/제품이 주는 핵심 가치(USP)
+3. 포스터의 메인 콘셉트 키워드 3가지
+4. 시선을 사로잡을 강렬한 헤드카피 3안 및 필수 4대 문구(일시/장소/준비물/문의처)를 깔끔하게 도출해줘."</pre>
+        </div>
+
+        <div class="easy-prompt-card" id="easy-prompt-1">
+          <b>🗣️ 왕초보 말로 쉽게 지시하기:</b><br>
+          <span>"AI야! 너는 광고 전문가야. [우리 산악회 단풍 산행 / 카페 신메뉴] 포스터를 기획할 건데, 사람들이 꼭 오고 싶어 할 멋진 콘셉트와 카피 제목 3개, 그리고 날짜/장소 글씨를 예쁘게 정리해줘!"</span>
+        </div>
+
+        <div class="timer-widget large" data-minutes="15">
+          <div class="digital-clock-box">
+            <span style="font-size: 18px;">⏱️</span>
+            <div class="timer-time">15:00</div>
+          </div>
+          <div class="timer-btns">
+            <div class="tbtn label-btn">⏱️ 실습시간</div>
+            <button class="tbtn start">시작</button>
+            <button class="tbtn reset">초기화</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="interactive-card rounded-xl p-5 flex flex-col justify-between" style="background: var(--panel); border-radius:14px; padding:20px;">
+        <div>
+          <h4 class="font-extrabold text-lg mb-3" style="color:var(--txt);">🎯 기획 브리프 4대 체크</h4>
+          <ul class="space-y-3 text-sm font-semibold" style="color:var(--muted); line-height: 1.8; list-style: none; padding: 0;">
+            <li>🎯 <b>타깃 정의:</b> 누구의 마음을 움직일 것인가?</li>
+            <li>💎 <b>핵심 가치(USP):</b> 왜 참여/구매해야 하는가?</li>
+            <li>🔑 <b>콘셉트 키워드 3종:</b> 비주얼과 카피의 뼈대</li>
+            <li>📌 <b>4대 필수문구:</b> 일시·장소·준비물·문의처 확인</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 07. [1부] AI 이미지 생성기로 비주얼 만들기 -->
+<section class="slide" data-title="07. [1부] AI 이미지 생성">
+  <div class="inner">
+    <div class="pill">🖼️ [1부] AI 이미지 생성기로 비주얼 만들기 (15분)</div>
+    <div class="pb-3">
+      <h2 style="text-align: left;">기획 콘셉트를 바탕으로 포스터 배경 이미지 생성하기</h2>
+      <p style="text-align: left; color: var(--muted); margin: 6px 0 16px; font-size: 15px;">6페이지에서 도출한 콘셉트를 이어받아, 글자가 들어갈 여백(Negative Space)이 확보된 배경 그림을 생성합니다.</p>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 my-auto items-stretch text-left" style="display:grid; grid-template-columns: 8fr 4fr; gap:20px;">
+      <div class="flex flex-col justify-between">
+        <div class="doc selected" style="margin: 0; max-width: 100%;">
+          <div class="dtag">Prompt 2 · Image Prompt & Generation</div>
+          <div class="doc-btn-group">
+            <button class="zoom-btn" onclick="openPromptModal('prompt-2', 'easy-prompt-2')">🔍 확대</button>
+            <button class="copy-btn" onclick="copyPrompt('prompt-2', this)">📋 복사</button>
+          </div>
+          <h4>[Step 1] LLM에게 이미지 생성 프롬프트 요구하기</h4>
+          <pre id="prompt-2" style="margin-bottom: 12px; color: var(--accent);">"앞서 6페이지에서 도출한 [콘셉트 키워드 3가지]에 어울리는 포스터 배경 그림을 만들려고 해. 상단과 중앙에 글씨를 써넣을 수 있도록 넉넉한 여백(Negative Space)을 포함한 고화질 이미지 생성 프롬프트(한글 및 영어)를 작성해줘."</pre>
+
+          <h4 style="margin-top: 10px;">[Step 2] 이미지 생성 AI(Gemini, DALL-E, Midjourney) 즉시 실습 샘플</h4>
+          <pre id="prompt-2-sample" style="color: var(--primary-light);">"밝고 따뜻한 가을 산길 분위기의 감성 수채화(지브리 스타일) 포스터 배경 그림. 단풍나무와 화사한 햇살, 친근하고 긍정적인 오라. 상단과 중앙에는 텍스트를 얹을 수 있도록 은은하고 넉넉한 여백 공간(Negative Space) 확보, 테두리 여백 없이 A4 세로 비율, 고화질 렌더링"</pre>
+        </div>
+
+        <div class="easy-prompt-card" id="easy-prompt-2">
+          <b>🗣️ 왕초보 말로 쉽게 지시하기:</b><br>
+          <span>"AI야! 아까 정한 [단풍 산행 / 카페 신메뉴] 분위기에 맞춰서, 위에 글씨 쓸 수 있게 위쪽을 깔끔하게 비워두고 따뜻한 수채화 그림을 A4 세로 크기로 그려줘!"</span>
+        </div>
+
+        <div class="timer-widget large" data-minutes="15">
+          <div class="digital-clock-box">
+            <span style="font-size: 18px;">⏱️</span>
+            <div class="timer-time">15:00</div>
+          </div>
+          <div class="timer-btns">
+            <div class="tbtn label-btn">⏱️ 실습시간</div>
+            <button class="tbtn start">시작</button>
+            <button class="tbtn reset">초기화</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="interactive-card rounded-xl p-5 flex flex-col justify-between" style="background: var(--panel); border-radius:14px; padding:20px;">
+        <div>
+          <h4 class="font-extrabold text-lg mb-3" style="color:var(--txt);">💡 2단계 비주얼 생성 프로세스</h4>
+          <ul class="space-y-3 text-sm font-semibold" style="color:var(--muted); line-height: 1.8; list-style: none; padding: 0;">
+            <li>💬 <b>1. 프롬프트 요청:</b> 6페이지 기획안을 바탕으로 이미지 프롬프트 도출</li>
+            <li>🎨 <b>2. 생성기 입력:</b> DALL-E/Midjourney/Gemini에 프롬프트 입력</li>
+            <li>🌌 <b>3. 여백 체크:</b> 상단/중앙에 글자 넣을 공간(Negative Space) 확인 후 저장</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 08. [2부] 미리캔버스 접속 및 배경 이미지 얹기 -->
+<section class="slide" data-title="08. [2부] 미리캔버스 세팅">
+  <div class="inner">
+    <div class="pill">🎨 [2부] 미리캔버스 접속 및 배경 배치 (15분)</div>
+    <div class="pb-3">
+      <h2 style="text-align: left;">미리캔버스 캔버스 설정 & 이미지 업로드</h2>
+      <p style="text-align: left; color: var(--muted); margin: 6px 0 16px; font-size: 15px;">무료 웹 디자인 툴 미리캔버스에서 A4 포스터 규격을 열고 1부에서 만든 AI 배경 이미지를 꽉 차게 배치합니다.</p>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 my-auto items-stretch text-left" style="display:grid; grid-template-columns: 8fr 4fr; gap:20px;">
+      <div class="flex flex-col justify-between">
+        <div class="doc selected" style="margin: 0; max-width: 100%;">
+          <div class="dtag">Step Guide 3 · Canvas Setup</div>
+          <div class="doc-btn-group">
+            <button class="zoom-btn" onclick="openPromptModal('prompt-3', 'easy-prompt-3')">🔍 확대</button>
+            <button class="copy-btn" onclick="copyPrompt('prompt-3', this)">📋 복사</button>
+          </div>
+          <h4>미리캔버스(miricanvas.com) 세팅 단계</h4>
+          <pre id="prompt-3">1. 웹 브라우저에서 '미리캔버스(miricanvas.com)'에 접속 후 로그인합니다.
+2. [디자인 만들기] -> [포스터(A4)] 또는 [세로형 카드뉴스] 규격을 선택합니다.
+3. 좌측 메뉴 [업로드]를 클릭하여 1부에서 생성한 AI 배경 이미지를 불러옵니다.
+4. 이미지를 캔버스 전체 화면에 맞춰 배경으로 깔끔하게 배치합니다.</pre>
+        </div>
+
+        <div class="easy-prompt-card" id="easy-prompt-3">
+          <b>🗣️ 왕초보 가이드:</b><br>
+          <span>"미리캔버스 사이트에 들어가서 '포스터 A4' 종이를 열고, 아까 만들어둔 AI 그림을 업로드해서 크게 펼쳐주세요!"</span>
+        </div>
+
+        <div class="timer-widget large" data-minutes="15">
+          <div class="digital-clock-box">
+            <span style="font-size: 18px;">⏱️</span>
+            <div class="timer-time">15:00</div>
+          </div>
+          <div class="timer-btns">
+            <div class="tbtn label-btn">⏱️ 실습시간</div>
+            <button class="tbtn start">시작</button>
+            <button class="tbtn reset">초기화</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="interactive-card rounded-xl p-5 flex flex-col justify-between" style="background: var(--panel); border-radius:14px; padding:20px;">
+        <div>
+          <h4 class="font-extrabold text-lg mb-3" style="color:var(--txt);">🎨 캔버스 세팅 체크</h4>
+          <ul class="space-y-3 text-sm font-semibold" style="color:var(--muted); line-height: 1.8; list-style: none; padding: 0;">
+            <li>📄 <b>규격 선택:</b> [디자인 만들기] -> [포스터 A4]</li>
+            <li>⬆️ <b>업로드:</b> 좌측 [업로드] 메뉴로 AI 그림 불러오기</li>
+            <li>🖼️ <b>배경 맞춤:</b> 캔버스 크기에 맞춰 꽉 차게 조절</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 09. [2부] 미리캔버스 텍스트 & 요소 완성 -->
+<section class="slide" data-title="09. [2부] 텍스트 & 디자인">
+  <div class="inner">
+    <div class="pill">✏️ [2부] 텍스트 배치 및 가독성 완성 (20분)</div>
+    <div class="pb-3">
+      <h2 style="text-align: left;">AI 카피 문구 입력 & 폰트 디자인 마감</h2>
+      <p style="text-align: left; color: var(--muted); margin: 6px 0 16px; font-size: 15px;">미리캔버스 텍스트 도구로 헤드카피와 4대 필수정보를 입력하고 가독성 높은 폰트와 색상으로 정돈합니다.</p>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 my-auto items-stretch text-left" style="display:grid; grid-template-columns: 8fr 4fr; gap:20px;">
+      <div class="flex flex-col justify-between">
+        <div class="doc selected" style="margin: 0; max-width: 100%;">
+          <div class="dtag">Step Guide 4 · Typography & Layout</div>
+          <div class="doc-btn-group">
+            <button class="zoom-btn" onclick="openPromptModal('prompt-4', 'easy-prompt-4')">🔍 확대</button>
+            <button class="copy-btn" onclick="copyPrompt('prompt-4', this)">📋 복사</button>
+          </div>
+          <h4>미리캔버스 텍스트 & 요소 편집 단계</h4>
+          <pre id="prompt-4">1. 좌측 [텍스트] 메뉴에서 '제목 텍스트 추가'를 눌러 메인 헤드카피를 입력합니다.
+2. 눈에 잘 띄는 굵은 폰트(예: 프리텐다드, 고딕, 손글씨)와 선명한 글자 색상을 적용합니다.
+3. [본문 텍스트 추가]로 일시, 장소, 준비물, 문의처를 하단 여백에 깔끔하게 배치합니다.
+4. 필요시 글자 뒤에 반투명 상자를 넣거나 [요소] 메뉴의 아이콘/스티커를 추가해 가독성을 높입니다.</pre>
+        </div>
+
+        <div class="easy-prompt-card" id="easy-prompt-4">
+          <b>🗣️ 왕초보 가이드:</b><br>
+          <span>"'글씨 추가' 버튼을 눌러서 제목이랑 날짜, 장소를 쓰고, 잘 보이도록 글씨를 크게 키우고 색을 예쁘게 바꿔주세요!"</span>
+        </div>
+
+        <div class="timer-widget large" data-minutes="20">
+          <div class="digital-clock-box">
+            <span style="font-size: 18px;">⏱️</span>
+            <div class="timer-time">20:00</div>
+          </div>
+          <div class="timer-btns">
+            <div class="tbtn label-btn">⏱️ 실습시간</div>
+            <button class="tbtn start">시작</button>
+            <button class="tbtn reset">초기화</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="interactive-card rounded-xl p-5 flex flex-col justify-between" style="background: var(--panel); border-radius:14px; padding:20px;">
+        <div>
+          <h4 class="font-extrabold text-lg mb-3" style="color:var(--txt);">✏️ 텍스트 배치 3원칙</h4>
+          <ul class="space-y-3 text-sm font-semibold" style="color:var(--muted); line-height: 1.8; list-style: none; padding: 0;">
+            <li>🔤 <b>폰트 위계:</b> 제목(굵은 산세리프) > 상세정보(레귤러)</li>
+            <li>👁️ <b>명도 대비:</b> 밝은 배경엔 어두운 글자, 어두운 배경엔 밝은 글자</li>
+            <li>📐 <b>정렬 정돈:</b> 좌측 또는 중앙 정렬로 시선 흐름 통일</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 10. 미리캔버스 3대 디자인 꿀팁 -->
+<section class="slide" data-title="10. 미리캔버스 3대 꿀팁">
+  <div class="inner">
+    <div class="pill">💡 실전 디자인 마감 꿀팁</div>
+    <h2>AI 배경 그림 위 글자를 한눈에 또렷하게 보이는 비법</h2>
+    <p class="sub">AI가 만든 화려한 그림 위에서도 글씨가 잘 읽히도록 완성도를 200% 올리는 필수 테크닉입니다.</p>
+    
+    <div class="three" style="max-width: 920px; margin-top: 28px;">
+      <div class="tc" style="background: var(--panel);">
+        <div class="tn step-1">꿀팁 1</div>
+        <h4>반투명 사각형 상자 넣기</h4>
+        <p>좌측 [요소] -> [도형]에서 사각형을 넣고 **투명도를 40~60%**로 조절해 글자 뒤에 받쳐주면 글씨가 또렷하게 돋보입니다.</p>
+      </div>
+
+      <div class="tc" style="background: var(--panel);">
+        <div class="tn step-2">꿀팁 2</div>
+        <h4>글자 외곽선 & 그림자 효과</h4>
+        <p>미리캔버스 텍스트 설정에서 **[외곽선(흰색/검은색)]** 또는 **[그림자]**를 활성화하면 배경 색상과 상관없이 명확히 읽힙니다.</p>
+      </div>
+
+      <div class="tc" style="background: var(--panel);">
+        <div class="tn step-3">꿀팁 3</div>
+        <h4>알록달록 스티커 & 뱃지</h4>
+        <p>좌측 [요소] 검색창에 **'단풍', '산', '일시 뱃지'**를 검색해 얹으면 디자이너가 만든 포스터처럼 화사해집니다.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 11. [2부] 고화질 다운로드 & 카톡 공유 -->
+<section class="slide" data-title="11. [2부] 저장 & 공유">
+  <div class="inner">
+    <div class="pill">💾 [2부] 고화질 저장 및 카톡 제출 (10분)</div>
+    <div class="pb-3">
+      <h2 style="text-align: left;">완성된 포스터 저장하기 & 자랑하기</h2>
+      <p style="text-align: left; color: var(--muted); margin: 6px 0 16px; font-size: 15px;">고해상도 PNG 또는 인쇄용 PDF로 다운로드하여 내 손으로 완성한 작품을 교육 단톡방에 공유합니다.</p>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 my-auto items-stretch text-left" style="display:grid; grid-template-columns: 8fr 4fr; gap:20px;">
+      <div class="flex flex-col justify-between">
+        <div class="doc selected" style="margin: 0; max-width: 100%;">
+          <div class="dtag">Step Guide 5 · Export & Share</div>
+          <div class="doc-btn-group">
+            <button class="zoom-btn" onclick="openPromptModal('prompt-5', 'easy-prompt-5')">🔍 확대</button>
+            <button class="copy-btn" onclick="copyPrompt('prompt-5', this)">📋 복사</button>
+          </div>
+          <h4>포스터 다운로드 & 단톡방 공유 방법</h4>
+          <pre id="prompt-5">1. 미리캔버스 우측 상단 [다운로드] 버튼을 클릭합니다.
+2. 웹/모바일 전송용은 [PNG/JPG (고해상도)], 인쇄용은 [PDF 파일]을 선택합니다.
+3. 내 컴퓨터나 스마트폰 다운로드 폴더에 포스터 이미지가 저장되었는지 확인합니다.
+4. 강의 교육용 카카오톡 단톡방에 내 손으로 완성한 나만의 포스터를 업로드해 공유합니다!</pre>
+        </div>
+
+        <div class="easy-prompt-card" id="easy-prompt-5">
+          <b>🗣️ 왕초보 가이드:</b><br>
+          <span>"우측 위에 '다운로드' 누르고 그림 파일로 저장해서, 우리 강의 단톡방에 멋진 내 포스터를 짠하고 올려주세요!"</span>
+        </div>
+
+        <div class="timer-widget large" data-minutes="10">
+          <div class="digital-clock-box">
+            <span style="font-size: 18px;">⏱️</span>
+            <div class="timer-time">10:00</div>
+          </div>
+          <div class="timer-btns">
+            <div class="tbtn label-btn">⏱️ 실습시간</div>
+            <button class="tbtn start">시작</button>
+            <button class="tbtn reset">초기화</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="interactive-card rounded-xl p-5 flex flex-col justify-between" style="background: var(--panel); border-radius:14px; padding:20px;">
+        <div>
+          <h4 class="font-extrabold text-lg mb-3" style="color:var(--txt);">📲 제출 & 다운로드 체크</h4>
+          <ul class="space-y-3 text-sm font-semibold" style="color:var(--muted); line-height: 1.8; list-style: none; padding: 0;">
+            <li>💾 <b>웹/모바일용:</b> [다운로드] -> [PNG 고해상도]</li>
+            <li>🖨️ <b>실제 인쇄용:</b> [다운로드] -> [PDF 인쇄용]</li>
+            <li>💬 <b>단톡방 제출:</b> 내 작품을 업로드하고 서로 칭찬하기</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 12. [팁] 광고 심의·효과성 피드백 및 피칭 (10분) -->
+<section class="slide" data-title="12. [팁] AI 광고 심의 & 피칭">
+  <div class="inner">
+    <div class="pill">⚖️ [팁] AI 광고 심의 & 피칭 (10분)</div>
+    <div class="pb-3">
+      <h2 style="text-align: left;">AI 마케터의 3초 주목도 & 메시지 전달력 심의</h2>
+      <p style="text-align: left; color: var(--muted); margin: 6px 0 16px; font-size: 15px;">완성된 포스터 이미지를 멀티모달 AI(ChatGPT, Gemini)에 업로드하여 광고주 및 마케터 관점에서 냉철하게 평가받습니다.</p>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 my-auto items-stretch text-left" style="display:grid; grid-template-columns: 8fr 4fr; gap:20px;">
+      <div class="flex flex-col justify-between">
+        <div class="doc selected" style="margin: 0; max-width: 100%;">
+          <div class="dtag">Prompt 6 · Ad Effectiveness Review</div>
+          <div class="doc-btn-group">
+            <button class="zoom-btn" onclick="openPromptModal('prompt-step-review', 'easy-prompt-step-review')">🔍 확대</button>
+            <button class="copy-btn" onclick="copyPrompt('prompt-step-review', this)">📋 복사</button>
+          </div>
+          <h4>AI 검토 프롬프트 (포스터 이미지 첨부 후 입력)</h4>
+          <pre id="prompt-step-review">"너는 수석 브랜드 마케터이자 광고 심의 위원이야. 이 완성된 포스터 이미지를 마케팅 관점에서 평가해줘.
+
+1. 3초 안에 시선이 머무는 주목도 평가 (10점 만점)
+2. 카피의 가독성 및 비주얼과의 조화 분석
+3. 브랜드 메시지 전달력에서 개선할 점 1가지"</pre>
+        </div>
+
+        <div class="easy-prompt-card" id="easy-prompt-step-review">
+          <b>🗣️ 피칭 & 단톡 공유 팁:</b><br>
+          <span>"완성된 포스터를 저장한 후 단톡방에 올리고, AI가 평가해 준 주목도 점수와 함께 자랑해 보세요!"</span>
+        </div>
+
+        <div class="timer-widget large" data-minutes="10">
+          <div class="digital-clock-box">
+            <span style="font-size: 18px;">⏱️</span>
+            <div class="timer-time">10:00</div>
+          </div>
+          <div class="timer-btns">
+            <div class="tbtn label-btn">⏱️ 실습시간</div>
+            <button class="tbtn start">시작</button>
+            <button class="tbtn reset">초기화</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="interactive-card rounded-xl p-5 flex flex-col justify-between" style="background: var(--panel); border-radius:14px; padding:20px;">
+        <div>
+          <h4 class="font-extrabold text-lg mb-3" style="color:var(--txt);">🏆 최종 평가 3원칙</h4>
+          <ul class="space-y-3 text-sm font-semibold" style="color:var(--muted); line-height: 1.8; list-style: none; padding: 0;">
+            <li>👀 <b>3초 룰:</b> 첫인상에서 시선이 꽂히는가?</li>
+            <li>💬 <b>가독성:</b> 1초 만에 핵심 혜택이 읽히는가?</li>
+            <li>🚀 <b>행동 유도:</b> 당장 구매/참여하고 싶은가?</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- 12. 5060 맞춤 AI 프롬프트 비법 -->
+<section class="slide" data-title="13. AI 프롬프트 비법">
+  <div class="inner">
+    <div class="pill">💡 5060 맞춤 비법</div>
+    <h2>5060 맞춤 AI 이미지 프롬프트 핵심 모음</h2>
+    <p class="sub">실사 사진보다 따뜻하고 영롱한 분위기의 그림 화풍 키워드가 인기 만점입니다.</p>
+    <div class="three">
+      <div class="tc"><div class="tn step-1">화풍</div><h4>그림 화풍 (Style)</h4><p class="sub-text" style="color:var(--accent); font-weight:700; margin-top:8px;">"따뜻한 수채화, 포근한 유화, 감성 일러스트, 3D 캐릭터, 한국화 느낌"</p></div>
+      <div class="tc"><div class="tn step-2">조명</div><h4>분위기 및 조명</h4><p class="sub-text" style="color:var(--accent); font-weight:700; margin-top:8px;">"화사한 햇살, 아늑하고 친근한 분위기, 포근하고 밝은 느낌, 긍정적인 오라"</p></div>
+      <div class="tc"><div class="tn step-3">구도</div><h4>여백 및 구도</h4><p class="sub-text" style="color:var(--primary-light); font-weight:700; margin-top:8px;">"글자 넣기 좋은 넉넉한 여백 공간, 단순하고 단정한 배경, 중앙 배치 구도"</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- 13. 좋은 프롬프트 vs 나쁜 프롬프트 -->
+<section class="slide" data-title="14. 프롬프트 비교">
+  <div class="inner">
+    <div class="pill">⚖️ 프롬프트 비교</div>
+    <h2>결과물의 차이를 만드는 프롬프트 작성법</h2>
+    <p class="sub">AI에게 입력하는 문장의 구체성이 높을수록 원하는 그림이 한 번에 생성됩니다.</p>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-y-12 md:gap-x-12 max-w-5xl mx-auto mt-8 text-left" style="transform: translateY(6px);">
+      <div class="tc prompt-bad-box" style="background:var(--panel); padding: 32px 28px; box-shadow: 0 10px 30px rgba(0,0,0,0.4);">
+        <div class="flex items-center gap-2 mb-4">
+          <span class="font-extrabold text-base" style="color:var(--rose);">❌ 피해야 할 요청</span>
+        </div>
+        <h4 class="text-lg font-extrabold mb-3" style="color:var(--txt);">"포스터 그림 하나 그려줘."</h4>
+        <p class="text-sm leading-relaxed" style="color:var(--muted);">
+          • 너무 모호하여 복잡하고 조잡한 그림이 꽉 채워져 생성됨<br>
+          • 글씨를 써넣을 자리가 없어 포스터 배경으로 사용 불가능<br>
+          • 원치 않는 엉뚱한 영어 텍스트가 그림에 박혀버림
+        </p>
+      </div>
+
+      <div class="tc prompt-good-box" style="background:var(--panel); padding: 32px 28px; box-shadow: 0 10px 30px rgba(0,0,0,0.4); margin-top: 6px;">
+        <div class="flex items-center gap-2 mb-4">
+          <span class="font-extrabold text-base" style="color:var(--primary-light);">✅ 권장하는 올바른 요청</span>
+        </div>
+        <h4 class="text-lg font-extrabold mb-3" style="color:var(--txt);">"따뜻한 가을 수채화 산길 그림, 상단에 글자 써넣을 넉넉한 여백 포함해줘."</h4>
+        <p class="text-sm leading-relaxed" style="color:var(--muted);">
+          • 분위기, 화풍, 글자용 여백 공간이 명확하여 포스터 배경으로 완벽함<br>
+          • 미리캔버스에서 폰트를 얹기 쉬워 작업 시간 단축<br>
+          • 고화질의 정갈한 결과물 즉시 완성
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 14. 자주 묻는 질문 FAQ -->
+<section class="slide" data-title="15. 자주 묻는 질문 FAQ">
+  <div class="inner">
+    <div class="pill">❓ FAQ & 실전 해결</div>
+    <h2>실습할 때 궁금하고 막히는 문제 1초 해결법</h2>
+    <p class="sub">수업 현장에서 강사님과 수강생이 가장 자주 물어보는 3가지 질문과 답변 모음입니다.</p>
+
+    <div class="fact" style="max-width: 880px; margin-top: 28px;">
+      <div class="f" style="border-left-color: var(--primary-light);">
+        <b style="color: var(--primary-light); font-size: 16px;">Q1. AI 그림 속에 이상한 영어 글자가 지저분하게 그려졌어요!</b><br>
+        <span style="color: var(--txt);">👉 <b>해결:</b> AI 프롬프트 끝에 <b>"글자 없이 그림만 그려줘, no text"</b>라고 추가해서 다시 생성하시거나, 미리캔버스에서 그 위에 예쁜 스티커나 텍스트 박스로 살짝 가려주시면 완벽합니다!</span>
+      </div>
+
+      <div class="f" style="border-left-color: var(--accent);">
+        <b style="color: var(--accent); font-size: 16px;">Q2. 스마트폰이나 컴퓨터로 다운로드한 그림을 어디서 찾나요?</b><br>
+        <span style="color: var(--txt);">👉 <b>해결:</b> 컴퓨터는 <b>'내PC -> 다운로드'</b> 폴더, 스마트폰은 <b>'갤러리 -> 다운로드'</b> 앨범에서 1초 만에 찾으실 수 있습니다.</span>
+      </div>
+
+      <div class="f" style="border-left-color: var(--orange-bright);">
+        <b style="color: var(--orange-bright); font-size: 16px;">Q3. AI가 내가 원하는 분위기와 다른 그림을 그려줘요!</b><br>
+        <span style="color: var(--txt);">👉 <b>해결:</b> "더 맑고 화사하게", "더 따뜻한 수채화 느낌으로"처럼 원하는 <b>느낌 표현 형용사</b>를 추가해서 다시 이야기해 보세요.</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 15. 실습 응용 주제 추천 4종 -->
+<section class="slide" data-title="16. 실습 응용 주제 4종">
+  <div class="inner">
+    <div class="pill">🏠 실습 응용 주제</div>
+    <h2>오늘 완성해 볼 수 있는 100% AI 추천 포스터 주제</h2>
+    <p class="sub">아래 유형 중 하나를 선택해 오늘 나만의 포스터를 직접 만들어 보세요.</p>
+    <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 18px; max-width: 900px; margin: 28px auto 0; text-align: left;">
+      <div class="tc"><div class="tn step-1">유형 A</div><h4>동네 모임 & 산악회 포스터</h4><p>AI로 만드는 산악회/친목회 정기모임 안내 및 가을 단풍 산행 모집 포스터</p></div>
+      <div class="tc"><div class="tn step-2">유형 B</div><h4>마을 행사 & 나눔 바자회</h4><p>AI 수채화로 그리는 동네 따뜻한 나눔 바자회 및 재능기부 동아리 모집 포스터</p></div>
+      <div class="tc"><div class="tn step-3">유형 C</div><h4>손주 돌잔치 & 칠순 축하장</h4><p>AI로 그리는 예쁜 손주 돌잔치/칠순 잔치 감성 초대장 및 가족 축하 포스터</p></div>
+      <div class="tc"><div class="tn step-4">유형 D</div><h4>시집 & 출간 출판회 포스터</h4><p>감성 화풍으로 완성하는 나만의 시집/수필 출간 정년퇴직 기념 초청장 포스터</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- 16. 전체 총복습 1분 요약 -->
+<section class="slide" data-title="17. 🧠 전체 총복습 1분 요약">
+  <div class="inner">
+    <div class="pill">🧠 [전체 총복습] 핵심 요약</div>
+    <h2>오늘 배운 AI 포스터 제작 4단계 한눈에 복습하기</h2>
+    <p class="sub">오늘 학습한 핵심 흐름을 머릿속에 기억하고 머뭇거림 없이 포스터를 만드는 1분 요약입니다.</p>
+
+    <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; max-width: 1000px; margin: 32px auto 0; text-align: left;">
+      <div class="tc" style="background: rgba(59, 130, 246, 0.08); border-color: rgba(59, 130, 246, 0.35);">
+        <div class="tn step-1">1단계: 기획</div>
+        <h4 style="color:#60A5FA; margin-top:12px;">💬 AI 문구 기획</h4>
+        <p style="font-size:13.5px; line-height:1.6;">
+          • Gemini·ChatGPT에게 카피 요청<br>
+          • <b>제목 3가지 + 4대 필수문구</b>(일시/장소/준비/문의) 획득
+        </p>
+      </div>
+
+      <div class="tc" style="background: rgba(45, 212, 191, 0.08); border-color: rgba(45, 212, 191, 0.35);">
+        <div class="tn step-2">2단계: 그림</div>
+        <h4 style="color:#2DD4BF; margin-top:12px;">🖼️ AI 이미지 생성</h4>
+        <p style="font-size:13.5px; line-height:1.6;">
+          • 수채화/지브리 화풍 프롬프트<br>
+          • <b>A4 세로 비율 + 상단 여백</b> 포함 고화질 배경 그림 저장
+        </p>
+      </div>
+
+      <div class="tc" style="background: rgba(245, 158, 11, 0.08); border-color: rgba(245, 158, 11, 0.35);">
+        <div class="tn step-3">3단계: 편집</div>
+        <h4 style="color:#FBBF24; margin-top:12px;">🎨 미리캔버스 편집</h4>
+        <p style="font-size:13.5px; line-height:1.6;">
+          • miricanvas.com 접속 후 업로드<br>
+          • <b>굵은 폰트 + 반투명 박스</b>로 가독성 높여 글자 얹기
+        </p>
+      </div>
+
+      <div class="tc" style="background: rgba(255, 83, 165, 0.08); border-color: rgba(255, 83, 165, 0.35);">
+        <div class="tn step-4">4단계: 공유</div>
+        <h4 style="color:#FF53A5; margin-top:12px;">📲 저장 & 단톡 공유</h4>
+        <p style="font-size:13.5px; line-height:1.6;">
+          • <b>PNG 고해상도 다운로드</b><br>
+          • 카톡 단톡방 제출 및 자랑하기 완료!
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 17. 오늘 배운 성과 마무리 -->
+<section class="slide" data-title="18. 학습 성과 마무리">
+  <div class="inner">
+    <div class="pill">📑 100분 학습 아웃라인</div>
+    <h2>100분 성과: 외부 디자이너 없이 완성!</h2>
+    <div class="three" style="margin-top: 32px;">
+      <div class="tc" style="grid-column: span 2;">
+        <h4 class="font-extrabold text-lg mb-2" style="color:var(--primary-light);">🎉 단계별 완료 아웃라인</h4>
+        <ul class="space-y-3 text-sm font-semibold" style="list-style:none; padding: 0; color:var(--muted);">
+          <li class="flex items-center gap-2"><span class="tn step-1" style="font-size:11px; padding:2px 8px; height:24px; min-width:auto;">1단계</span> <span>AI 챗봇으로 4대 필수 포스터 문구 카피라이팅 완성</span></li>
+          <li class="flex items-center gap-2"><span class="tn step-2" style="font-size:11px; padding:2px 8px; height:24px; min-width:auto;">2단계</span> <span>화사한 수채화/일러스트 메인 배경 프롬프트 생성</span></li>
+          <li class="flex items-center gap-2"><span class="tn step-3" style="font-size:11px; padding:2px 8px; height:24px; min-width:auto;">3단계</span> <span>미리캔버스에서 폰트, 색상, 배치 가독성 정교한 편집</span></li>
+          <li class="flex items-center gap-2"><span class="tn step-4" style="font-size:11px; padding:2px 8px; height:24px; min-width:auto;">4단계</span> <span>PNG/PDF 고화질 다운로드 및 카카오톡 단톡방 제출완료</span></li>
+        </ul>
+      </div>
+      <div class="tc">
+        <h4 class="font-extrabold text-lg mb-2" style="color:var(--accent);">🚀 높은 성취감</h4>
+        <p class="text-sm leading-relaxed" style="margin-top:10px; color:var(--muted);">기존 템플릿에 글자만 바꾸는 것이 아니라, <b>문구 창작부터 비주얼 창작, 최종 디자인 마감</b>까지 100% AI와 손잡고 스스로 완성해 낸 성취감을 선사합니다!</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 18. ✨ [신규 추가] 한방에 만드는 포스터 디자인 샘플 프롬프트 -->
+<section class="slide" data-title="19. ✨ 한방 포스터 샘플 프롬프트">
+  <div class="inner">
+    <div class="pill">✨ 실전 샘플 꿀팁</div>
+    <h2 style="color: var(--primary-light); text-shadow: 0 0 20px rgba(59, 130, 246, 0.4);">한방에 만드는 포스터 디자인 샘플 프롬프트</h2>
+    <p class="sub">강의 홍보, 모임 안내 등 원하는 내용을 AI에게 아래와 같이 한 번에 요청하면 감각적인 3D 애니메이션 포스터가 탄생합니다.</p>
+    
+    <div class="doc selected" style="margin: 22px auto 0; max-width: 900px; border-color: #60A5FA; box-shadow: 0 0 35px rgba(59, 130, 246, 0.35);">
+      <div class="dtag" style="background: var(--primary); color: #fff; border: none; font-size: 12px; padding: 5px 12px;">✨ ALL-IN-ONE SAMPLE PROMPT</div>
+      <div class="doc-btn-group">
+        <button class="zoom-btn" onclick="openPromptModal('prompt-sample-shorts', 'easy-prompt-sample-shorts')">🔍 확대</button>
+        <button class="copy-btn" style="background: var(--primary); color: #fff; border: none;" onclick="copyPrompt('prompt-sample-shorts', this)">📋 1초 전체 복사</button>
+      </div>
+      <h4 style="color: var(--primary-light); font-size: 18px; font-weight: 900; margin-bottom: 12px;">🎬 AI 홍보 쇼츠영상 강좌 포스터 디자인 실전 프롬프트</h4>
+      <pre id="prompt-sample-shorts" style="font-size: 14px; color: var(--txt); line-height: 1.65;">"너는 아트디렉터이자 포스터 제작 10년차 전문가야. [AI로 내가 만드는 홍보 쇼츠영상] 무료강좌를 홍보하는 고품격 포스터를 기획하고 완성해줘.
+
+[포스터 수록 필수 문구 & 내용]
+• 최상단 메인 뱃지: '필요한 AI 무료강의 4탄!'
+• 메인 헤드타이틀: 'AI로 만드는 홍보 쇼츠영상 (무료, 누구나 가능)'
+• 일시: 2026년 9월 17일 (목) 오후 4시 ~ 6시
+• 장소: 전태일기념관 4층 교육실
+
+[비주얼 스타일 & 톤앤매너 지시]
+• 이미지 화풍: 감각적인 3D 애니메이션 및 전문 일러스트레이터 스타일
+• 주요 비주얼: 친근하고 귀여운 AI와 자연스럽게 소통하는 감성적인 이미지
+• 분위기: 누구나 보고 당장 수강하고 싶은 세련되고 전문적인 톤앤매너
+• 규격 & 레이아웃: A4 세로 비율, 한글 폰트 가독성 최우선, 상단 여백 확보"
+</pre>
+    </div>
+
+    <div class="easy-prompt-card" id="easy-prompt-sample-shorts" style="max-width: 900px; margin: 16px auto 0; background: rgba(59, 130, 246, 0.08); border-color: rgba(59, 130, 246, 0.4);">
+      <b style="color: var(--primary-light);">🗣️ 왕초보 말로 쉽게 지시하기:</b><br>
+      <span>"AI야! 다음 4탄 [AI 숏폼 영상 만들기] 강의 포스터를 3D 애니메이션 수채화 스타일로 완성해줘! 날짜는 9월 17일 오후 4시, 전태일기념관 4층 교육실로 적어줘!"</span>
+    </div>
+  </div>
+</section>
+
+<!-- 19. 🎁 [강사 특급 선물] 카페 음료 홍보 포스터 자동 생성 마스터 프롬프트 -->
+<section class="slide" data-title="20. 🎁 카페 음료 포스터 마스터">
+  <div class="inner">
+    <div class="pill">🎁 강사 특급 시크릿 선물</div>
+    <h2 style="color: var(--gold); text-shadow: 0 0 20px rgba(255, 215, 0, 0.4);">☕ 카페 신메뉴·음료 홍보 포스터 자동 완성 마스터 프롬프트</h2>
+    <p class="sub">아래 대괄호 [ ] 속 내용만 내 카페와 음료 정보로 바꿔서 AI 대화창에 넣으면, **카피부터 먹음직스러운 비주얼 포스터 전체**를 한 번에 싹 다 완성해 드립니다!</p>
+    
+    <div class="doc selected" style="margin: 22px auto 0; max-width: 900px; border-color: var(--orange-bright); box-shadow: 0 0 35px rgba(245, 158, 11, 0.35);">
+      <div class="dtag" style="background: var(--orange); color: #fff; border: none; font-size: 12px; padding: 5px 12px;">🎁 ALL-IN-ONE CAFE BEVERAGE MASTER PROMPT</div>
+      <div class="doc-btn-group">
+        <button class="zoom-btn" onclick="openPromptModal('prompt-final-master', 'easy-prompt-final-master')">🔍 확대</button>
+        <button class="copy-btn" style="background: var(--orange); color: #fff; border: none;" onclick="copyPrompt('prompt-final-master', this)">📋 1초 전체 복사</button>
+      </div>
+      <h4 style="color: var(--orange-bright); font-size: 18px; font-weight: 900; margin-bottom: 12px;">☕ [음료 정보만 넣으면 자동 완성] 카페 신메뉴 포스터 마스터 프롬프트</h4>
+      <pre id="prompt-final-master" style="font-size: 14px; color: var(--txt); line-height: 1.65;">"너는 F&B 및 카페 브랜딩 10년차 전문 포스터 디자이너이자 수석 카피라이터야. 내가 제공하는 아래 [카페 음료 정보]를 바탕으로 손님들의 시선과 입맛을 사로잡는 완벽한 신메뉴 홍보 포스터를 기획하고 완성해줘.
+
+[입력할 내 카페 & 음료 정보]
+• 카페 이름/컨셉: [예: 카페 포레스트 / 아늑한 도심 속 감성 힐링 카페]
+• 홍보 음료명: [예: 가을 시즌 한정 '제주 말차 크림 라떼' & '생딸기 듬뿍 슈페너']
+• 음료 특징/가격: [예: 100% 유기농 말차의 깊은 풍미, 부드러운 수제 크림 토핑 / 6,500원]
+• 이벤트/프로모션: [예: 신메뉴 주문 시 디저트 1,000원 할인 or 아메리카노 1+1 쿠폰 증정]
+• 기간 및 위치: [예: 9월 1일 ~ 10월 31일 / 매장 1층 카운터 문의]
+
+[AI 너의 자동 출력 임무]
+1. [헤드카피]: 손님의 침샘을 자극하고 당장 주문하고 싶게 만드는 매력적인 타이틀 3가지 추천
+2. [포스터 4대 문구]: 음료명, 핵심 매력 포인트, 가격 및 이벤트 혜택, 기간을 한눈에 읽히는 정돈된 텍스트로 가공
+3. [완성형 이미지 프롬프트]: 유리잔에 담긴 시원하고 먹음직스러운 음료 비주얼, 따뜻하고 감각적인 카페 테이블 조명과 배경, 상단/중앙에 글씨가 들어갈 깔끔한 여백 공간을 포함한 세로형 A4 포스터 생성용 한글 및 영어 프롬프트 작성
+4. [미리캔버스 조합 팁]: 이 음료 분위기에 가장 잘 어울리는 추천 폰트와 감성적인 글자 색상 조합 제안"
+</pre>
+    </div>
+
+    <div class="easy-prompt-card" id="easy-prompt-final-master" style="max-width: 900px; margin: 16px auto 0; background: rgba(245, 158, 11, 0.08); border-color: rgba(245, 158, 11, 0.4);">
+      <b style="color: var(--orange-bright);">🎁 강사의 선물 활용법:</b><br>
+      <span>"집에 가셔서 위 복사 버튼을 누른 후, [ ] 안의 카페 이름, 음료 이름, 가격과 할인 행사만 쓱 고쳐서 AI 대화창(Gemini/ChatGPT)에 넣으세요! AI가 군침 도는 카피 문구부터 예쁜 음료 그림 주문서까지 한방에 만들어 줍니다!"</span>
+    </div>
+  </div>
+</section>
+
+<!-- 20. 수고하셨습니다 -->
+<section class="slide" style="border-bottom:none" data-title="21. 수고하셨습니다">
+  <div class="inner">
+    <div class="chapter">수고하셨습니다 👏</div>
+    <h2 style="font-size: clamp(32px, 5.5vw, 60px); font-weight: 900; margin: 0 0 16px; letter-spacing: -1.5px;">나만의 포스터 완성!</h2>
+    <p class="sub animate-entry delay-100">디자인 몰라도 OK — 오늘 여러분은 근사한 포스터 디자이너가 되셨습니다.<br>완성된 포스터를 카카오톡 단톡방에 올리고 서로 많이 칭찬해 주세요!</p>
+    
+    <div class="max-w-2xl mx-auto next-class-box animate-entry delay-200 mt-8">
+      <h3 class="next-class-title">
+        <span>📢</span>
+        <span>2차 특강 안내: 포스터 홍보 AI 숏폼 영상 만들기</span>
+      </h3>
+      <p class="text-base md:text-lg leading-relaxed font-medium" style="color:var(--txt); margin: 0 auto; max-width: 620px; padding-bottom: 6px;">
+        1차에서 만든 나만의 포스터를 바탕으로, 이를 널리 홍보하는 <b style="color:var(--orange-bright); font-weight:800;">'AI 숏폼 영상 만들기' 2차 특강</b>이 준비되어 있습니다. 대본부터 영상 편집까지 신나게 완성하는 다음 시간에서 또 만나요! ☆
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- 프롬프트 대형 확대 모달 팝업 UI -->
+<div id="prompt-modal">
+  <div class="modal-box">
+    <h3>
+      <span>🔍 실습 프롬프트 확대보기</span>
+      <button class="modal-close-btn" onclick="closePromptModal()">❌ 닫기 (ESC)</button>
+    </h3>
+    <div style="font-size:14px; color:var(--muted); margin-bottom:10px;">[원본 기술 마스터 프롬프트]</div>
+    <pre id="modal-prompt-text"></pre>
+    <div id="modal-easy-prompt-box" class="easy-prompt-card" style="margin-top:16px; font-size:16px; padding:18px;">
+    </div>
+  </div>
+</div>
+
+<!-- 알림 토스트 팝업 -->
+<div id="toast-message">
+  <span>✅</span>
+  <span>클립보드에 프롬프트가 복사되었습니다! 이제 AI에게 붙여넣으세요! 🎉</span>
+</div>
+
+<script>
+/* ================= Remotion 몽환적 사파이어/틸 오로라 백그라운드 ================= */
+(function initRemotionGradient() {
+  const canvas = document.getElementById('remotion-canvas');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  let width, height;
+  let t = 0;
+
+  function resize() {
+    width = canvas.width = window.innerWidth;
+    height = canvas.height = window.innerHeight;
+  }
+  window.addEventListener('resize', resize);
+  resize();
+
+  const blobs = [
+    { x: 0.20, y: 0.25, r: 0.65, color: 'rgba(59, 130, 246, 0.38)', vx: 0.0015, vy: 0.0018 },
+    { x: 0.80, y: 0.20, r: 0.70, color: 'rgba(45, 212, 191, 0.32)', vx: -0.0018, vy: 0.0012 },
+    { x: 0.50, y: 0.78, r: 0.60, color: 'rgba(96, 165, 250, 0.30)', vx: 0.0012, vy: -0.0015 },
+    { x: 0.30, y: 0.65, r: 0.55, color: 'rgba(245, 158, 11, 0.25)', vx: -0.0020, vy: -0.0010 }
+  ];
+
+  function render() {
+    t += 0.018;
+    ctx.clearRect(0, 0, width, height);
+
+    blobs.forEach((b, i) => {
+      const cx = (b.x + Math.sin(t * 0.8 + i * 1.5) * 0.20) * width;
+      const cy = (b.y + Math.cos(t * 0.6 + i * 1.5) * 0.20) * height;
+      const radius = b.r * Math.min(width, height) * (1 + Math.sin(t * 0.5 + i) * 0.18);
+
+      const grad = ctx.createRadialGradient(cx, cy, 0, cx, cy, radius);
+      grad.addColorStop(0, b.color);
+      grad.addColorStop(0.7, b.color.replace(/[\d\.]+\)$/, '0.12)'));
+      grad.addColorStop(1, 'rgba(6, 14, 26, 0)');
+
+      ctx.fillStyle = grad;
+      ctx.beginPath();
+      ctx.arc(cx, cy, radius, 0, Math.PI * 2);
+      ctx.fill();
+    });
+
+    requestAnimationFrame(render);
+  }
+  render();
+})();
+
+/* ================= 슬라이드 & UI 제어 스크립트 ================= */
+(function(){
+  var slides = Array.prototype.slice.call(document.querySelectorAll('.slide'));
+  var dotsContainer = document.getElementById('dots');
+  var slideSelectNav = document.getElementById('slide-select-nav');
+  var totalSlides = slides.length;
+  
+  slides.forEach(function(slide, index) {
+    var slideNum = index + 1;
+    slide.id = 'slide-' + slideNum;
+    var title = slide.getAttribute('data-title') || ('슬라이드 ' + slideNum);
+    
+    var dot = document.createElement('a');
+    dot.href = '#';
+    dot.setAttribute('data-num', (slideNum < 10 ? '0' : '') + slideNum);
+    dot.setAttribute('data-title', title);
+    dot.addEventListener('click', function(e) {
+      e.preventDefault();
+      goToSlide(slideNum);
+    });
+    dotsContainer.appendChild(dot);
+  });
+  
+  var dotElements = Array.prototype.slice.call(dotsContainer.children);
+  var currentSlide = 1;
+  var previousSlide = null;
+
+  function goToSlide(n) {
+    if (n < 1) n = 1;
+    if (n > totalSlides) n = totalSlides;
+    previousSlide = currentSlide;
+    currentSlide = n;
+    updateSlide();
+  }
+  window.goToSlide = goToSlide;
+
+  function updateSlide() {
+    var direction = (previousSlide === null) ? null : (currentSlide > previousSlide ? 'dir-next' : 'dir-prev');
+    
+    slides.forEach(function(slide, idx) {
+      var slideNum = idx + 1;
+      slide.classList.remove('dir-next', 'dir-prev');
+      
+      if (slideNum === currentSlide) {
+        slide.classList.add('in', 'active');
+        if (direction) {
+          slide.style.animation = 'none';
+          void slide.offsetHeight;
+          slide.style.animation = ''; 
+          slide.classList.add(direction);
+        }
+        slide.querySelectorAll('.animate-entry').forEach(function(inner) {
+          inner.style.animation = 'none';
+          void inner.offsetHeight;
+          inner.style.animation = '';
+        });
+      } else {
+        slide.classList.remove('active');
+      }
+    });
+
+    dotElements.forEach(function(dot, idx) {
+      dot.classList.toggle('on', idx === (currentSlide - 1));
+    });
+
+    if (slideSelectNav) {
+      slideSelectNav.value = currentSlide.toString();
+    }
+
+    var progressBar = document.getElementById('pbar');
+    if (progressBar) {
+      progressBar.style.width = (currentSlide / totalSlides * 100) + '%';
+    }
+
+    if (slides[currentSlide - 1]) {
+      slides[currentSlide - 1].scrollIntoView({ behavior: 'smooth' });
+    }
+  }
+
+  function nextSlide() {
+    if (currentSlide < totalSlides) {
+      previousSlide = currentSlide;
+      currentSlide++;
+      updateSlide();
+    }
+  }
+  window.nextSlide = nextSlide;
+
+  function prevSlide() {
+    if (currentSlide > 1) {
+      previousSlide = currentSlide;
+      currentSlide--;
+      updateSlide();
+    }
+  }
+  window.prevSlide = prevSlide;
+
+  window.addEventListener('keydown', function(e) {
+    var tag = document.activeElement ? document.activeElement.tagName : '';
+    if (['INPUT','TEXTAREA','BUTTON','A','SELECT'].includes(tag)) return;
+    
+    if (e.key === 'Escape') {
+      closePromptModal();
+    }
+    if (e.key === 'ArrowDown' || e.key === 'PageDown' || e.key === 'ArrowRight' || e.key === ' ') {
+      e.preventDefault();
+      nextSlide();
+    }
+    if (e.key === 'ArrowUp' || e.key === 'PageUp' || e.key === 'ArrowLeft') {
+      e.preventDefault();
+      prevSlide();
+    }
+  });
+
+  if ('IntersectionObserver' in window) {
+    var observer = new IntersectionObserver(function(entries) {
+      entries.forEach(function(entry) {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('in');
+          var currentIndex = slides.indexOf(entry.target);
+          currentSlide = currentIndex + 1; 
+          
+          dotElements.forEach(function(dot, j) {
+            dot.classList.toggle('on', j === currentIndex);
+          });
+          
+          if (slideSelectNav) {
+            slideSelectNav.value = currentSlide.toString();
+          }
+
+          var progressBar = document.getElementById('pbar');
+          if (progressBar) {
+            progressBar.style.width = (currentSlide / totalSlides * 100) + '%';
+          }
+        }
+      });
+    }, { threshold: 0.5, rootMargin: '0px 0px -5% 0px' });
+    
+    slides.forEach(function(slide) {
+      observer.observe(slide);
+    });
+  } else {
+    slides.forEach(function(slide) {
+      slide.classList.add('in');
+    });
+  }
+
+  window.addEventListener('scroll', function() {
+    var scrollTop = window.scrollY;
+    var scrollHint = document.querySelector('.hint');
+    if (scrollHint) {
+      scrollHint.style.opacity = scrollTop > 200 ? '0' : '1';
+    }
+  }, { passive: true });
+
+  updateSlide();
+})();
+
+/* ================= 뷰어 컨트롤 기능 ================= */
+const btnFullscreen = document.getElementById('btn-fullscreen');
+btnFullscreen.addEventListener('click', function() {
+  if (!document.fullscreenElement) {
+    document.documentElement.requestFullscreen().then(() => {
+      btnFullscreen.innerHTML = '🖥️ <span>해제</span>';
+      btnFullscreen.classList.add('active');
+    }).catch(err => console.log(err));
+  } else {
+    if (document.exitFullscreen) {
+      document.exitFullscreen().then(() => {
+        btnFullscreen.innerHTML = '🖥️ <span>전체화면</span>';
+        btnFullscreen.classList.remove('active');
+      });
+    }
+  }
+});
+
+const btnTheme = document.getElementById('btn-theme');
+btnTheme.addEventListener('click', function() {
+  document.body.classList.toggle('light-mode');
+  const isLight = document.body.classList.contains('light-mode');
+  if (isLight) {
+    btnTheme.innerHTML = '☀️ <span>주간</span>';
+    btnTheme.classList.add('active');
+  } else {
+    btnTheme.innerHTML = '🌙 <span>야간</span>';
+    btnTheme.classList.remove('active');
+  }
+});
+
+const btnMobileView = document.getElementById('btn-mobile-view');
+btnMobileView.addEventListener('click', function() {
+  document.body.classList.toggle('mobile-view');
+  const isMobile = document.body.classList.contains('mobile-view');
+  if (isMobile) {
+    btnMobileView.innerHTML = '📱 <span>모바일ON</span>';
+    btnMobileView.classList.add('active');
+  } else {
+    btnMobileView.innerHTML = '📱 <span>모바일뷰</span>';
+    btnMobileView.classList.remove('active');
+  }
+});
+
+/* ================= 프롬프트 확대 모달 기능 ================= */
+function openPromptModal(promptId, easyPromptId) {
+  var text = document.getElementById(promptId).textContent;
+  document.getElementById('modal-prompt-text').textContent = text;
+  
+  if (easyPromptId && document.getElementById(easyPromptId)) {
+    document.getElementById('modal-easy-prompt-box').innerHTML = document.getElementById(easyPromptId).innerHTML;
+    document.getElementById('modal-easy-prompt-box').style.display = 'block';
+  } else {
+    document.getElementById('modal-easy-prompt-box').style.display = 'none';
+  }
+  
+  document.getElementById('prompt-modal').classList.add('show');
+}
+window.openPromptModal = openPromptModal;
+
+function closePromptModal() {
+  document.getElementById('prompt-modal').classList.remove('show');
+}
+window.closePromptModal = closePromptModal;
+
+// 프롬프트 복사 기능
+function copyPrompt(id, btn) {
+  var content = document.getElementById(id).textContent;
+  var toast = document.getElementById('toast-message');
+
+  function showSuccess() {
+    toast.classList.add('show');
+    if (btn) {
+      if (btn.dataset.originalHtml === undefined) btn.dataset.originalHtml = btn.innerHTML;
+      btn.innerHTML = '✅ 복사 완료!';
+    }
+    setTimeout(function() {
+      toast.classList.remove('show');
+      if (btn) {
+        btn.innerHTML = btn.dataset.originalHtml;
+      }
+    }, 2200);
+  }
+
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(content).then(showSuccess).catch(function() {
+      fallbackCopy(content, showSuccess);
+    });
+  } else {
+    fallbackCopy(content, showSuccess);
+  }
+}
+window.copyPrompt = copyPrompt;
+
+function fallbackCopy(text, cb) {
+  var textarea = document.createElement('textarea');
+  textarea.value = text;
+  textarea.style.position = 'fixed';
+  textarea.style.opacity = '0';
+  document.body.appendChild(textarea);
+  textarea.select();
+  try {
+    document.execCommand('copy');
+    cb();
+  } catch (err) {
+    console.error('클립보드 복사 에러:', err);
+  }
+  document.body.removeChild(textarea);
+}
+
+/* ================= 디지털 시계 타이머 제어 스크립트 ================= */
+document.querySelectorAll('.timer-widget').forEach(function(widget){
+  const totalSec = parseInt(widget.getAttribute('data-minutes'), 10) * 60;
+  let remaining = totalSec, timerId = null;
+  const timeEl = widget.querySelector('.timer-time');
+  const startBtn = widget.querySelector('.start');
+  const resetBtn = widget.querySelector('.reset');
+
+  function fmt(sec){ const m = Math.floor(sec/60), s = sec%60; return (m<10?'0':'')+m+':'+(s<10?'0':'')+s; }
+  function paint(){ timeEl.textContent = fmt(remaining); }
+  
+  function beep(){
+    try{
+      const ctx = new (window.AudioContext || window.webkitAudioContext)();
+      [0,1,2].forEach(function(i){
+        const o = ctx.createOscillator(), g = ctx.createGain();
+        o.connect(g); g.connect(ctx.destination);
+        o.frequency.value = 660; g.gain.value = 0.06;
+        o.start(ctx.currentTime + i*0.28); o.stop(ctx.currentTime + i*0.28 + 0.18);
+      });
+    }catch(e){}
+  }
+  
+  function tick(){
+    remaining--;
+    if (remaining <= 0){
+      remaining = 0; paint(); clearInterval(timerId); timerId = null;
+      startBtn.textContent = '완료'; startBtn.classList.add('!bg-rose-600'); beep(); return;
+    }
+    paint();
+  }
+  
+  startBtn.addEventListener('click', function(){
+    if (timerId){ clearInterval(timerId); timerId = null; startBtn.textContent = '계속'; return; }
+    if (remaining <= 0){ remaining = totalSec; startBtn.classList.remove('!bg-rose-600'); }
+    startBtn.textContent = '일시정지'; timerId = setInterval(tick, 1000);
+  });
+  
+  resetBtn.addEventListener('click', function(){
+    clearInterval(timerId); timerId = null; remaining = totalSec;
+    startBtn.textContent = '실습 시작'; startBtn.classList.remove('!bg-rose-600'); paint();
+  });
+  paint();
+});
+</script>
+</body>
+</html>
